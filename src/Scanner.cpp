@@ -1,5 +1,6 @@
 #include <Scanner.h>
 #include <cctype>
+#include <iostream>
 
 const std::unordered_map<std::string, TokenType>  Scanner::keywords({
     {"and", TOKEN_AND},
@@ -31,15 +32,15 @@ std::vector<Token> Scanner::scanTokens() {
             return std::vector<Token>{token};
         }
         tokens.push_back(token);
-        start = current;
     }
     return tokens;
 }
 
 void Scanner::skipWhiteSpace() {
-    while(start < source.length() && isspace(source[start])) {
-        start++;
+    while(!isAtEnd() && isspace(source[current])) {
+        current++;
     }
+    start = current;
 }
 
 Token Scanner::scanToken() {
@@ -89,7 +90,7 @@ Token Scanner::scanToken() {
                 if(iter == Scanner::keywords.end()) {
                     // identifier
                     return Token(TOKEN_IDENTIFIER,
-                            source.substr(start, current),
+                            word,
                             line);
                 } else {
                     // identifier
@@ -97,6 +98,7 @@ Token Scanner::scanToken() {
                 }
             }
     }
+    throw "unexpected token in scanner";
 }
 
 bool isalnum_(char ch) {
@@ -107,7 +109,7 @@ std::string Scanner::getIdentifier() {
     while (isalnum_(peekCurrent())) {
         current++;
     }
-    return source.substr(start, current);
+    return source.substr(start, current - start);
 }
 
 char Scanner::peekCurrent() {
@@ -140,7 +142,7 @@ Token Scanner::makeString() {
 }
 
 Token Scanner::makeToken(TokenType type) {
-    return Token(type, source.substr(start, current), line);
+    return Token(type, source.substr(start, current - start), line);
 }
 
 char Scanner::getChar() {
