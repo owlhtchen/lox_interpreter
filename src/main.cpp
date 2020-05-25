@@ -6,13 +6,16 @@
 #include <Token.h>
 #include <Scanner.h>
 
-void run(std::string source) {
+void run(std::string source, bool exit_on_error) {
     Scanner scanner(std::move(source));
     auto tokens = scanner.scanTokens();
     if(scanner.error()) {
         auto errorToken = tokens.at(0);
         std::cout << "Error at line " << errorToken.line << ": "
         << errorToken.lexeme << std::endl;
+        if(exit_on_error) {
+            return;
+        }
     } else {
         for(const auto & t: tokens) {
             std::cout << "lexeme: " <<  t.lexeme << std::endl;
@@ -28,7 +31,7 @@ void runLine() {
         if(source == "quit") {
             break;
         }
-        run(source);
+        run(source, false);
     }
 }
 
@@ -36,7 +39,7 @@ void runFile(char * filepath) {
     std::ifstream source_file(filepath);
     std::stringstream buffer;
     buffer << source_file.rdbuf();
-    run(buffer.str());
+    run(buffer.str(), true);
 }
 
 int main(int argc, char *argv[])

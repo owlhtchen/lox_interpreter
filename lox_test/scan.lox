@@ -8,4 +8,6 @@ var test_str = "hello world";
 
 var empty = "";
 
-// var wrong = "wihiw;
+var wrong = "wihiw;
+
+var wrong2 = "@usiohfiw

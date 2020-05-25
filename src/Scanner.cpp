@@ -136,11 +136,14 @@ Token Scanner::makeDigit() {
 }
 
 Token Scanner::makeString() {
-    while(peekCurrent() != -1 && peekCurrent() != '"') {
+    while(peekCurrent() != -1 && peekCurrent() != '"' && peekCurrent() != '\n') {
         current++;
     }
     if(isAtEnd()) {
         return Token(TOKEN_ERROR, "not terminated string", line);
+    }
+    if(peekCurrent() == '\n') {
+        return Token(TOKEN_ERROR, "string not terminated within one line", line);
     }
     current++; // consume the ending "
     return Token(TOKEN_STRING, source.substr(start + 1, current - 1 - (start + 1)) , line);
