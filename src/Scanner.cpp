@@ -38,6 +38,9 @@ std::vector<Token> Scanner::scanTokens() {
 
 void Scanner::skipWhiteSpace() {
     while(!isAtEnd() && isspace(source[current])) {
+        if(source[current] == '\n') {
+            line++;
+        }
         current++;
     }
     start = current;
@@ -62,7 +65,8 @@ Token Scanner::scanToken() {
         case '/': {
             if(match('/')) {
                 // skip comment
-                while(peekCurrent() != '\n' || peekCurrent() != -1) {
+                while(peekCurrent() != '\n' && peekCurrent() != -1) {
+                    current++;
                 }
                 return makeToken(TOKEN_COMMENT);
             } else {
@@ -93,7 +97,7 @@ Token Scanner::scanToken() {
                             word,
                             line);
                 } else {
-                    // identifier
+                    // keyword
                     return Token(iter->second, iter->first, line);
                 }
             }
@@ -124,6 +128,7 @@ Token Scanner::makeDigit() {
         current++;
     }
     if(peekCurrent() == '.') {
+        current++;
         while (isdigit(peekCurrent())) {
             current++;
         }
