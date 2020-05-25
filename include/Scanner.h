@@ -2,43 +2,38 @@
 #define SCANNER_H
 
 #include <string>
+#include <vector>
+#include <Token.h>
+#include <unordered_map>
 
-typedef enum {
-    // Single-character tokens.
-    TOKEN_LEFT_PAREN, TOKEN_RIGHT_PAREN,
-    TOKEN_LEFT_BRACE, TOKEN_RIGHT_BRACE,
-    TOKEN_COMMA, TOKEN_DOT, TOKEN_MINUS, TOKEN_PLUS,
-    TOKEN_SEMICOLON, TOKEN_SLASH, TOKEN_STAR,
-
-    // One or two character tokens.
-    TOKEN_BANG, TOKEN_BANG_EQUAL,
-    TOKEN_EQUAL, TOKEN_EQUAL_EQUAL,
-    TOKEN_GREATER, TOKEN_GREATER_EQUAL,
-    TOKEN_LESS, TOKEN_LESS_EQUAL,
-
-    // Literals.
-    TOKEN_IDENTIFIER, TOKEN_STRING, TOKEN_NUMBER,
-
-    // Keywords.
-    TOKEN_AND, TOKEN_CLASS, TOKEN_ELSE, TOKEN_FALSE,
-    TOKEN_FOR, TOKEN_FUN, TOKEN_IF, TOKEN_NIL, TOKEN_OR,
-    TOKEN_PRINT, TOKEN_RETURN, TOKEN_SUPER, TOKEN_THIS,
-    TOKEN_TRUE, TOKEN_VAR, TOKEN_WHILE,
-
-    TOKEN_ERROR,
-    TOKEN_EOF
-} TokenType;    
-
-class Token {
-
-    public: 
-    TokenType type;
-    std::string lexeme;
+class Scanner {
+private:
+    static const std::unordered_map<std::string, TokenType> keywords;
+    std::string source;
+    int start;
+    int current;
     int line;
+    bool hasError;
+public:
+    Scanner(std::string source):
+        source(std::move(source)), start(0), current(0), line(1), hasError(false) {
 
-    Token(TokenType type, std::string lexeme, int line): 
-        type(type), lexeme(lexeme), line(line) {}
-};    
+    }
 
+    std::vector<Token> scanTokens();
+    Token scanToken();
+    char getChar();
+    bool isAtEnd();
+    Token makeToken(TokenType type);
+    bool match(char ch);
+    void skipWhiteSpace();
+    char peekCurrent();
+    Token makeDigit();
+    Token makeString();
+    bool error() {
+        return hasError;
+    }
+    std::string getIdentifier();
+};
 
 #endif
