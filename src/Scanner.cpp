@@ -22,7 +22,6 @@ const std::unordered_map<std::string, TokenType>  Scanner::keywords({
 });
 
 std::vector<Token> Scanner::scanTokens() {
-    std::vector<Token> tokens;
     while (!isAtEnd()) {
         auto token = scanToken();
         if(token.type == TOKEN_COMMENT) {
@@ -143,7 +142,8 @@ Token Scanner::makeString() {
     if(isAtEnd()) {
         return Token(TOKEN_ERROR, "not terminated string", line);
     }
-    return Token(TOKEN_STRING, source.substr(start + 1, current - 1) , line);
+    current++; // consume the ending "
+    return Token(TOKEN_STRING, source.substr(start + 1, current - 1 - (start + 1)) , line);
 }
 
 Token Scanner::makeToken(TokenType type) {

@@ -14,6 +14,7 @@ private:
     int current;
     int line;
     bool hasError;
+    std::vector<Token> tokens;
 public:
     Scanner(std::string source):
         source(std::move(source)), start(0), current(0), line(1), hasError(false) {
