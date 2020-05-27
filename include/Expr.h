@@ -8,6 +8,7 @@
 class VisitorExpr;
 
 class Expr {
+public:
     virtual void accept(VisitorExpr& visitor) = 0;
 };
 
@@ -17,7 +18,7 @@ class LiteralExpr: public Expr {
 public:
     Value value;
     Token token;
-    explicit LiteralExpr(Token token);
+    explicit LiteralExpr(const Token& token);
     void accept(VisitorExpr& visitor) override ;
 };
 
@@ -32,8 +33,8 @@ public:
 
 class GroupingExpr: public Expr {
 public:
-    std::unique_ptr<Expr> expr;
-    explicit GroupingExpr(std::unique_ptr<Expr> expr): expr(std::move(expr)) {};
+    std::unique_ptr<Expr> innerExpr;
+    explicit GroupingExpr(std::unique_ptr<Expr> innerExpr): innerExpr(std::move(innerExpr)) {};
     void accept(VisitorExpr& visitor) override ;
 };
 

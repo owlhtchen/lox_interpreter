@@ -1,6 +1,7 @@
 #include <Scanner.h>
 #include <cctype>
 #include <iostream>
+#include <stdexcept>
 
 const std::unordered_map<std::string, TokenType>  Scanner::keywords({
     {"and", TOKEN_AND},
@@ -101,7 +102,7 @@ Token Scanner::scanToken() {
                 }
             }
     }
-    throw "unexpected token in scanner";
+    throw std::logic_error("unexpected token in scanner [Scanner.cpp]");
 }
 
 bool isalnum_(char ch) {

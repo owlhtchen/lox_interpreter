@@ -2,6 +2,7 @@
 #ifndef LOX_INTERPRETER_VISITOREXPR_H
 #define LOX_INTERPRETER_VISITOREXPR_H
 
+class  Expr;
 class LiteralExpr;
 class UnaryExpr;
 class GroupingExpr;

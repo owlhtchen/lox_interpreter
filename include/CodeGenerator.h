@@ -1,11 +1,11 @@
 
-#ifndef LOX_INTERPRETER_COMPILER_H
-#define LOX_INTERPRETER_COMPILER_H
+#ifndef LOX_INTERPRETER_CODEGENERATOR_H
+#define LOX_INTERPRETER_CODEGENERATOR_H
 
 #include <VisitorExpr.h>
 #include <Chunk.h>
 
-class Compiler: public VisitorExpr {
+class CodeGenerator: public VisitorExpr {
 public:
     Chunk chunk;
 private:
@@ -13,6 +13,7 @@ private:
      void visitUnaryExpr(const UnaryExpr& expr) override;
      void visitGroupingExpr(const GroupingExpr& expr) override;
      void visitBinaryExpr(const BinaryExpr& expr) override;
+     void compile(Expr& expr);
 };
 
-#endif //LOX_INTERPRETER_COMPILER_H
+#endif //LOX_INTERPRETER_CODEGENERATOR_H

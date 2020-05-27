@@ -3,17 +3,10 @@
 #include <iostream>
 #include <Expr.h>
 #include <VisitorExpr.h>
-#include <Token.h>
+#include <cassert>
 
-LiteralExpr::LiteralExpr(Token token) {
-    token = token;
-    switch (token.type) {
-        case TOKEN_NUMBER:
-            value = atof(token.lexeme.c_str());
-            break;
-    }
-
-    std::cerr << "Should not reach here [Expr.cpp]" << std::endl;
+LiteralExpr::LiteralExpr(const Token& token):token(token) {
+    assert(token.type == TOKEN_NUMBER);
 }
 
 void LiteralExpr::accept(VisitorExpr& visitor) {

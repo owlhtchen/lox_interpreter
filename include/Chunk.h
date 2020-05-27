@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <Token.h>
 #include <cstdint>
+#include <OpCode.h>
 
 // using ValueArray = std::vector<Value>;
 
@@ -18,6 +19,9 @@ private:
     uint8_t addConstant(Value value);
 public:
     void emitByte(uint8_t byte, int line);
+    void emitBytes(uint8_t first, uint8_t second, int line);
+    void emitConstantValue(const Token& token);
+    void emitOpCode(OpCode opCode, int line);
 };
 
 #endif //LOX_INTERPRETER_CHUNK_H
