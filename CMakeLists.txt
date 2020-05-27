@@ -8,7 +8,8 @@ set(SOURCES
         src/Expr.cpp
         src/CodeGenerator.cpp
         src/Chunk.cpp
-        src/CompileError.cpp
+        src/Error.cpp
+        src/Parser.cpp
         )
 
 add_executable(lox_interpreter ${SOURCES})

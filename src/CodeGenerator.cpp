@@ -1,7 +1,7 @@
 #include <CodeGenerator.h>
 #include <OpCode.h>
 #include <Expr.h>
-#include <CompileError.h>
+#include <Error.h>
 
 void CodeGenerator::visitLiteralExpr(const LiteralExpr &expr) {
     chunk.emitConstantValue(expr.token);

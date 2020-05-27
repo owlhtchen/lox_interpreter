@@ -5,6 +5,7 @@
 #include <sstream>
 #include <Token.h>
 #include <Scanner.h>
+#include <Parser.h>
 
 void run(std::string source, bool exit_on_error) {
     Scanner scanner(std::move(source));
@@ -17,10 +18,16 @@ void run(std::string source, bool exit_on_error) {
             return;
         }
     } else {
+#define LOX_DEBUG
+#ifdef LOX_DEBUG
         for(const auto & t: tokens) {
             std::cout << "lexeme: " <<  t.lexeme << std::endl;
         }
+#endif
+
     }
+
+
 }
 
 void runLine() {
