@@ -6,6 +6,7 @@
 #include <Token.h>
 
 LiteralExpr::LiteralExpr(Token token) {
+    token = token;
     switch (token.type) {
         case TOKEN_NUMBER:
             value = atof(token.lexeme.c_str());

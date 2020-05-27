@@ -16,6 +16,7 @@ class Expr {
 class LiteralExpr: public Expr {
 public:
     Value value;
+    Token token;
     explicit LiteralExpr(Token token);
     void accept(VisitorExpr& visitor) override ;
 };
