@@ -1,5 +1,3 @@
-#define LOX_DEBUG
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -8,40 +6,61 @@
 #include <Token.h>
 #include <Scanner.h>
 #include <Parser.h>
+#include <CodeGenerator.h>
 
+#include <common.h>
 #ifdef LOX_DEBUG
 #include <AstPrinter.h>
 #include <debug.h>
 #endif
 
+#ifdef LOX_DEBUG
 void run(std::string source, bool exit_on_error) {
     Scanner scanner(std::move(source));
     auto tokens = scanner.scanTokens();
     if(scanner.error()) {
         auto errorToken = tokens.at(0);
         std::cout << "Error at line " << errorToken.line << ": "
-        << errorToken.lexeme << std::endl;
+                  << errorToken.lexeme << std::endl;
         if(exit_on_error) {
             return;
         }
     } else {
-#ifdef LOX_DEBUG
         for(const auto & t: tokens) {
             std::cout << "lexeme: " <<  t.lexeme <<
-            " with type: " << tokentype_to_string[t.type] <<
-            std::endl;
+                      " with type: " << tokentype_to_string[t.type] <<
+                      std::endl;
         }
-#endif
         auto parser = Parser(tokens);
         auto expr = parser.parse();
-#ifdef LOX_DEBUG
         AstPrinter astPrinter;
         astPrinter.printAst(*expr);
-#endif
+        std::cout << std::endl;
+        CodeGenerator codeGenerator;
+        codeGenerator.compile(*expr);
+        disassembleChunk(&codeGenerator.chunk);
+    }
+}
+#else
+void run(std::string source, bool exit_on_error) {
+    Scanner scanner(std::move(source));
+    auto tokens = scanner.scanTokens();
+    if(scanner.error()) {
+        auto errorToken = tokens.at(0);
+        std::cout << "Error at line " << errorToken.line << ": "
+                  << errorToken.lexeme << std::endl;
+        if(exit_on_error) {
+            return;
+        }
+    } else {
+        auto parser = Parser(tokens);
+        auto expr = parser.parse();
+        CodeGenerator codeGenerator;
+        codeGenerator.compile(*expr);
     }
 
-
 }
+#endif
 
 void runLine() {
     std::string source;

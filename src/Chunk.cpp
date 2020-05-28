@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <Token.h>
+#include <Error.h>
 
 void Chunk::emitByte(uint8_t byte, int line) {
     // e.g. OpCode with no argument
@@ -35,7 +36,7 @@ void Chunk::emitConstantValue(const Token& token) {
     }
     auto constant_id = addConstant(constant);
     if(constant_id > 255) {
-
+        throw CompileError(token, "more than 255 constants in one chunk");
     }
     emitBytes(static_cast<uint8_t>(OpCode::OP_CONSTANT), constant_id, token.line);
 }
