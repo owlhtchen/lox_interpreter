@@ -7,7 +7,7 @@
 #include <Token.h>
 #include <memory>
 #include <initializer_list>
-class Expr;
+#include <Expr.h>
 
 class Parser {
 private:

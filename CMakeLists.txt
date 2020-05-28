@@ -10,6 +10,8 @@ set(SOURCES
         src/Chunk.cpp
         src/Error.cpp
         src/Parser.cpp
+        src/AstPrinter.cpp
+        src/debug.cpp
         )
 
 add_executable(lox_interpreter ${SOURCES})

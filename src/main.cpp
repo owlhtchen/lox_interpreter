@@ -1,3 +1,5 @@
+#define LOX_DEBUG
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -6,6 +8,11 @@
 #include <Token.h>
 #include <Scanner.h>
 #include <Parser.h>
+
+#ifdef LOX_DEBUG
+#include <AstPrinter.h>
+#include <debug.h>
+#endif
 
 void run(std::string source, bool exit_on_error) {
     Scanner scanner(std::move(source));
@@ -18,13 +25,19 @@ void run(std::string source, bool exit_on_error) {
             return;
         }
     } else {
-#define LOX_DEBUG
 #ifdef LOX_DEBUG
         for(const auto & t: tokens) {
-            std::cout << "lexeme: " <<  t.lexeme << std::endl;
+            std::cout << "lexeme: " <<  t.lexeme <<
+            " with type: " << tokentype_to_string[t.type] <<
+            std::endl;
         }
 #endif
-
+        auto parser = Parser(tokens);
+        auto expr = parser.parse();
+#ifdef LOX_DEBUG
+        AstPrinter astPrinter;
+        astPrinter.printAst(*expr);
+#endif
     }
 
 

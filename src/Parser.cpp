@@ -2,7 +2,7 @@
 #include "Parser.h"
 #include <Expr.h>
 #include <Error.h>
-
+#include <stdexcept>
 #include <utility>
 
 std::unique_ptr<Expr> Parser::parse() {
@@ -70,7 +70,11 @@ std::unique_ptr<Expr> Parser::primary() {
     } else if(match(TOKEN_LEFT_PAREN)) {
         auto innerExpr = expression();
         consume(TOKEN_RIGHT_PAREN, "Missing )");
+        return std::make_unique<GroupingExpr>(std::move(innerExpr));
     }
+
+    throw std::logic_error("primary nullptr in parser: with token "
+          + tokens[current].lexeme + " of type: " + std::to_string(tokens[current].type));
 }
 
 bool Parser::isAtEnd() {

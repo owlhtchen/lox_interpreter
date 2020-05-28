@@ -48,10 +48,10 @@ void Scanner::skipWhiteSpace() {
 
 Token Scanner::scanToken() {
     skipWhiteSpace();
-    char ch = getChar();
     if(isAtEnd()) {
         return makeToken(TOKEN_EOF);
     }
+    char ch = getChar();
     switch (ch) {
         case '(': return makeToken(TOKEN_LEFT_PAREN);
         case ')': return makeToken(TOKEN_RIGHT_PAREN);
