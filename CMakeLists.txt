@@ -11,6 +11,7 @@ set(SOURCES
         src/Error.cpp
         src/Parser.cpp
         src/AstPrinter.cpp
+        src/VM.cpp
         src/debug.cpp
         )
 

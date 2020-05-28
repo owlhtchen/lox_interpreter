@@ -14,9 +14,11 @@
 #include <debug.h>
 #endif
 
+class VM;
 // using ValueArray = std::vector<Value>;
 
 class Chunk{
+    friend class VM;
 private:
     std::vector<uint8_t> code;
     std::vector<int> lines;

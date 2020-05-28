@@ -29,4 +29,15 @@ public:
 };
 
 
+class RuntimeError:public std::exception {
+    // error when generating ast
+private:
+    std::string message;
+    int line;
+public:
+    RuntimeError(int line, std::string message):
+            line(line), message(std::move(message)) {};
+    [[nodiscard]] const char* what() const noexcept override;
+};
+
 #endif //LOX_INTERPRETER_ERROR_H

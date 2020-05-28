@@ -7,6 +7,7 @@
 #include <Scanner.h>
 #include <Parser.h>
 #include <CodeGenerator.h>
+#include <VM.h>
 
 #include <common.h>
 #ifdef LOX_DEBUG
@@ -39,6 +40,9 @@ void run(std::string source, bool exit_on_error) {
         CodeGenerator codeGenerator;
         codeGenerator.compile(*expr);
         disassembleChunk(&codeGenerator.chunk);
+        VM vm(codeGenerator.chunk);
+        vm.run();
+        auto other = vm;
     }
 }
 #else
@@ -83,9 +87,6 @@ void runFile(char * filepath) {
 
 int main(int argc, char *argv[])
 {
-    
-//    Token t(TOKEN_BANG, "!", 100);
-//    std::cout <<  t.lexeme << " " << t.line << std::endl;
     if(argc == 1) {
         runLine();
     } else if(argc == 2){
