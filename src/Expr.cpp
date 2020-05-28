@@ -3,10 +3,12 @@
 #include <iostream>
 #include <Expr.h>
 #include <VisitorExpr.h>
-#include <cassert>
+#include <Error.h>
 
 LiteralExpr::LiteralExpr(const Token& token):token(token) {
-    assert(token.type == TOKEN_NUMBER);
+    if(token.type != TOKEN_NUMBER) {
+        throw SyntaxError(token, "unexpected token as LiteralExpr");
+    }
 }
 
 void LiteralExpr::accept(VisitorExpr& visitor) {

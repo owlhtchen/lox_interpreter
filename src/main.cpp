@@ -42,7 +42,7 @@ void run(std::string source, bool exit_on_error) {
         disassembleChunk(&codeGenerator.chunk);
         VM vm(codeGenerator.chunk);
         vm.run();
-        auto other = vm;
+        auto other = vm;  // breakpoint here: check vm.stack
     }
 }
 #else
@@ -61,6 +61,8 @@ void run(std::string source, bool exit_on_error) {
         auto expr = parser.parse();
         CodeGenerator codeGenerator;
         codeGenerator.compile(*expr);
+        VM vm(codeGenerator.chunk);
+        vm.run();
     }
 
 }
