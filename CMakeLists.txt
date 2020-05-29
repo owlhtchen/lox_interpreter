@@ -13,6 +13,8 @@ set(SOURCES
         src/AstPrinter.cpp
         src/VM.cpp
         src/debug.cpp
+        src/Object.cpp
+        src/GarbageCollector.cpp
         )
 
 add_executable(lox_interpreter ${SOURCES})

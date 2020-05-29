@@ -8,6 +8,8 @@
 #include <Value.h>
 #include <OpCode.h>
 
+class Object;
+
 class VM {
 private:
     Chunk chunk;
