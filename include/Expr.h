@@ -17,7 +17,7 @@ public:
 // LiteralExpr, UnaryExpr, GroupingExpr, BinaryExpr
 class LiteralExpr: public Expr {
 public:
-    Value value;
+//    Value value;
     Token token;
     explicit LiteralExpr(const Token& token);
     void accept(VisitorExpr& visitor) override ;

@@ -63,6 +63,7 @@ void run(std::string source, bool exit_on_error) {
         codeGenerator.compile(*expr);
         VM vm(codeGenerator.chunk);
         vm.run();
+        auto other = vm;  // breakpoint here: check vm.stack
     }
 
 }

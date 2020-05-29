@@ -1,4 +1,7 @@
 
+#include <common.h>
+#ifdef LOX_DEBUG
+
 #include <debug.h>
 #include <Chunk.h>
 #include <iostream>
@@ -154,3 +157,6 @@ int disassembleInstruction(Chunk* chunk, int i) {
     }
     throw std::logic_error("unhandled case in debug");
 }
+
+
+#endif

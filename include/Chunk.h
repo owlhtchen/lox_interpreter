@@ -29,7 +29,7 @@ public:
     void emitBytes(uint8_t first, uint8_t second, int line);
     void emitConstantValue(const Token& token);
     void emitOpCode(OpCode opCode, int line);
-
+    void emitOpCodes(OpCode first, OpCode second, int line);
 
 #ifdef LOX_DEBUG
     friend void disassembleChunk(Chunk* chunk);

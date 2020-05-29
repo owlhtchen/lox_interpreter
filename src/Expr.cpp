@@ -6,8 +6,12 @@
 #include <Error.h>
 
 LiteralExpr::LiteralExpr(const Token& token):token(token) {
-    if(token.type != TOKEN_NUMBER) {
-        throw SyntaxError(token, "unexpected token as LiteralExpr");
+    if(token.type != TOKEN_NUMBER
+    && token.type != TOKEN_NIL
+    && token.type != TOKEN_TRUE
+    && token.type != TOKEN_FALSE
+    ) {
+        throw SyntaxError(token, "unexpected token " + this->token.lexeme + " as LiteralExpr");
     }
 }
 

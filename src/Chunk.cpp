@@ -45,4 +45,9 @@ void Chunk::emitOpCode(OpCode opCode, int line) {
     emitByte(static_cast<uint8_t>(opCode), line);
 }
 
+void Chunk::emitOpCodes(OpCode first, OpCode second, int line) {
+    emitByte(static_cast<uint8_t>(first), line);
+    emitByte(static_cast<uint8_t>(second), line);
+}
+
 
