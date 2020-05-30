@@ -17,6 +17,7 @@ public:
     static GarbageCollector& getInstance();
     template <typename T>
     T* addObject(T* _object);
+    void freeAllObjects();
 };
 
 template <typename T>

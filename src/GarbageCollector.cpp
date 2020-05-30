@@ -8,3 +8,13 @@ GarbageCollector &GarbageCollector::getInstance() {
     return gc;
 }
 
+void GarbageCollector::freeAllObjects() {
+    Object *current, *prev;
+    current = allObjects;
+    while(current != nullptr) {
+        prev = current;
+        current = current->next;
+        free(prev);
+    }
+}
+
