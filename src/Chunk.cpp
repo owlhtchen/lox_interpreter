@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <Token.h>
 #include <Error.h>
+#include <Object.h>
 
 void Chunk::emitByte(uint8_t byte, int line) {
     // e.g. OpCode with no argument
@@ -30,6 +31,9 @@ void Chunk::emitConstantValue(const Token& token) {
     switch (token.type) {
         case TOKEN_NUMBER:
             constant = atof(token.lexeme.c_str());
+            break;
+        case TOKEN_STRING:
+            constant = StringPool::getInstance().getStringObj(token.lexeme);
             break;
         default:
             throw std::logic_error("unexpected token type [Chunk.cpp]");

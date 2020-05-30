@@ -4,6 +4,7 @@
 #include <variant>
 #include <Error.h>
 #include <iostream>
+#include <Object.h>
 
 Chunk& VM::getCurrentChunk() {
     return chunk;
@@ -61,7 +62,15 @@ void VM::run() {
                 if(second_double && first_double) {
                     stack.push_back(basic_arithmetic(currentOpcode, *first_double, *second_double));
                 } else if(currentOpcode == OpCode::OP_ADD) {
-                    // TODO:add string
+                    Object* second_obj = *std::get_if<Object*>(&second);
+                    Object* first_obj = *std::get_if<Object*>(&first);
+                    if(second_obj && first_obj) {
+                        auto second_str = second_obj->dyn_cast<StringObj>();
+                        auto first_str = first_obj->dyn_cast<StringObj>();
+                        std::string new_str = first_str->str + second_str->str;
+                        stack.push_back(StringPool::getInstance().getStringObj(new_str));
+//                        stack.push_back(first_obj->str + second_obj->str);
+                    }
                 } else {
                     throw RuntimeError(getCurrentLine(), "+ - * / opr only support number or string (for add)");
                 }
@@ -82,8 +91,14 @@ void VM::run() {
                     stack.push_back(*first_bool == *second_bool);
                     break;
                 }
-                // TODO: add support for string
-                throw RuntimeError(getCurrentLine(), "== opr only support number");
+                auto second_obj = *std::get_if<Object*>(&second);
+                auto first_obj = *std::get_if<Object*>(&first);
+                if(second_obj && first_obj) {
+                    // string with the same content should share the same StringObj in StringPool
+                    stack.push_back(first_obj == second_obj);
+                    break;
+                }
+                throw RuntimeError(getCurrentLine(), "== opr only support number, boolean or string");
             }
             case OpCode::OP_GREATER:
             case OpCode::OP_LESS: {

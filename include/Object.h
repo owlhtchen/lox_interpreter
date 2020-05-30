@@ -22,14 +22,23 @@ public:
     virtual ~Object() = default;
     // llvm style rtti
     template <typename T>
-    bool isa();
+    bool isa() {
+        return typeid(*this) == typeid(T);
+    }
     template <typename T>
-    T* cast();
+    T* cast() {
+        if(this->isa<T>()) {
+            return static_cast<T*>(this);
+        }
+    }
     template <typename T>
-    T* dyn_cast();
+    T* dyn_cast() {
+        return dynamic_cast<T*>(this);
+    }
 };
 
 class StringObj: public Object {
+    friend class VM;
 private:
     std::string str;
 public:

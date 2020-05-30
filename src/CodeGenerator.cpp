@@ -7,7 +7,6 @@
 void CodeGenerator::visitLiteralExpr(const LiteralExpr &expr) {
     auto line = expr.token.line;
     switch (expr.token.type) {
-        // TODO: string
         case TOKEN_TRUE:
             chunk.emitOpCode(OpCode::OP_TRUE, line);
             break;
@@ -17,6 +16,7 @@ void CodeGenerator::visitLiteralExpr(const LiteralExpr &expr) {
         case TOKEN_NIL:
             chunk.emitOpCode(OpCode::OP_NIL, line);
             break;
+        case TOKEN_STRING:
         case TOKEN_NUMBER:
             chunk.emitConstantValue(expr.token);
             break;

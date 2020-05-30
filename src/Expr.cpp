@@ -10,6 +10,7 @@ LiteralExpr::LiteralExpr(const Token& token):token(token) {
     && token.type != TOKEN_NIL
     && token.type != TOKEN_TRUE
     && token.type != TOKEN_FALSE
+    && token.type != TOKEN_STRING
     ) {
         throw SyntaxError(token, "unexpected token " + this->token.lexeme + " as LiteralExpr");
     }
