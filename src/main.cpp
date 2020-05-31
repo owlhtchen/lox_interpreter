@@ -8,6 +8,7 @@
 #include <Parser.h>
 #include <CodeGenerator.h>
 #include <VM.h>
+#include <GarbageCollector.h>
 
 #include <common.h>
 #ifdef LOX_DEBUG
@@ -58,12 +59,14 @@ void run(std::string source, bool exit_on_error) {
         }
     } else {
         auto parser = Parser(tokens);
-        auto expr = parser.parse();
+        parser.parse();
         CodeGenerator codeGenerator;
-        codeGenerator.compile(*expr);
-        VM vm(codeGenerator.chunk);
-        vm.run();
-        auto other = vm;  // breakpoint here: check vm.stack
+//        codeGenerator.compile(*expr);
+//        VM vm(codeGenerator.chunk);
+//        vm.run();
+//        auto other = vm;  // breakpoint here: check vm.stack
+//        GarbageCollector::getInstance().freeAllObjects();
+
     }
 
 }

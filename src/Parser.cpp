@@ -1,12 +1,14 @@
 
-#include "Parser.h"
+#include <Parser.h>
 #include <Expr.h>
 #include <Error.h>
 #include <stdexcept>
 #include <utility>
 
-std::unique_ptr<Expr> Parser::parse() {
-    return expression();
+void Parser::parse() {
+    while (!isAtEnd()) {
+        statements.push_back(std::move(declaration()));
+    }
 }
 
 std::unique_ptr<Expr> Parser::expression() {
@@ -112,6 +114,29 @@ void Parser::consume(TokenType type, std::string err_msg ) {
     }
 }
 
+std::unique_ptr<Stmt> Parser::declaration() {
+    if(match(TOKEN_VAR)) { // varDecl
+        Token varToken = tokens[current++];
+        std::unique_ptr<Expr> expr = nullptr;
+        if(match(TOKEN_EQUAL)) {
+            expr = expression();
+        }
+        return std::make_unique<VarDeclStmt>(varToken, std::move(expr));
+    } else { // statement
+        return statement();
+    }
+}
 
+std::unique_ptr<Stmt> Parser::statement() {
+    if(match(TOKEN_PRINT)) { // printStmt;
+        auto expr = expression();
+        consume(TOKEN_SEMICOLON, "expected ;");
+        return std::make_unique<PrintStmt>(std::move(expr));
+    } else { // exprStmt;
+        auto expr = expression();
+        consume(TOKEN_SEMICOLON, "expected ;");
+        return std::make_unique<ExprStmt>(std::move(expr));
+    }
+}
 
 

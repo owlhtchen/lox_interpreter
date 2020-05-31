@@ -16,6 +16,7 @@ private:
     int ip;
     std::vector<Value> stack;
 public:
+    // should take in a functionObj
     explicit VM(Chunk chunk): chunk(std::move(chunk)), ip(0) { };
     void run();
     Chunk& getCurrentChunk();

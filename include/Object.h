@@ -6,8 +6,10 @@
 #include <Error.h>
 #include <string>
 #include <unordered_map>
+#include <Chunk.h>
 
 class GarbageCollector;
+class CodeGenerator;
 
 class Object {
     friend class GarbageCollector;
@@ -54,6 +56,19 @@ public:
     StringPool& operator= (StringPool const & copy) = delete;
     static StringPool& getInstance();
     StringObj* getStringObj(const std::string& str);  // non-static
+};
+
+class FunctionObj: public Object {
+    friend class GarbageCollector;
+    friend class CodeGenerator;
+    friend class VM;
+private:
+    std::string name;
+    int arity;
+    Chunk chunk;
+public:
+    FunctionObj(std::string name, int arity): name(std::move(name)), arity(arity){ };
+
 };
 
 #endif //LOX_INTERPRETER_OBJECT_H
