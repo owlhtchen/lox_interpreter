@@ -1,10 +1,12 @@
 
-#include "Compiler.h"
+#include "FunctionCompiler.h"
 #include <cstdint>
+#include <utility>
 #include <Error.h>
 #include <Object.h>
+#include <GarbageCollector.h>
 
-void Compiler::declareLocal(const Token &token) {
+void FunctionCompiler::declareLocal(const Token &token) {
     if(currentScopeDepth == 0) {
         return;
     }
@@ -22,7 +24,7 @@ void Compiler::declareLocal(const Token &token) {
     addLocal(token);
 }
 
-void Compiler::addLocal(const Token &token) {
+void FunctionCompiler::addLocal(const Token &token) {
     // append token to locals
     if(locals.size() > UINT8_MAX) {
         throw CompileError(token, "too many local variables");
@@ -30,19 +32,30 @@ void Compiler::addLocal(const Token &token) {
     locals.emplace_back(token, -1);
 }
 
-void Compiler::markDefined() {
+void FunctionCompiler::markDefined() {
     locals.back().scopeDepth = currentScopeDepth;
 }
 
-void Compiler::beginScope() {
+void FunctionCompiler::beginScope() {
     currentScopeDepth++;
 }
 
-void Compiler::endScope() {
+void FunctionCompiler::endScope() {
     currentScopeDepth--;
     while (locals.size() >= 0 &&
     locals.back().scopeDepth > currentScopeDepth) {
         locals.pop_back();
+    }
+}
+
+FunctionCompiler::FunctionCompiler(std::shared_ptr<FunctionCompiler> enclosing, FunctionType funcType,
+        std::string funcName): enclosing(std::move(enclosing)), functionType(funcType) {
+    currentScopeDepth = 0;
+    functionObj = GarbageCollector::getInstance().addObject(new FunctionObj(std::move(funcName)));
+    if(functionType == METHOD_TYPE) {
+        locals.emplace_back(Token("this"), 0);
+    } else {
+        locals.emplace_back(Token(""), 0);
     }
 }
 

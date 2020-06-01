@@ -3,7 +3,7 @@
 #include <Expr.h>
 #include <Error.h>
 #include <stdexcept>
-#include <Compiler.h>
+#include <FunctionCompiler.h>
 #include <Object.h>
 #include <Stmt.h>
 #include <Object.h>
@@ -32,7 +32,7 @@ void CodeGenerator::visitLiteralExpr(const LiteralExpr &expr) {
 
 void CodeGenerator::visitUnaryExpr(const UnaryExpr &expr) {
     auto chunk = getCurrentChunk();
-    compile(*expr.right);
+    compileExpr(*expr.right);
     switch (expr.opr.type) {
         case TOKEN_MINUS:
             chunk->emitOpCode(OpCode::OP_NEGATE, expr.opr.line);
@@ -46,13 +46,13 @@ void CodeGenerator::visitUnaryExpr(const UnaryExpr &expr) {
 }
 
 void CodeGenerator::visitGroupingExpr(const GroupingExpr &expr) {
-    compile(*expr.innerExpr);
+    compileExpr(*expr.innerExpr);
 }
 
 void CodeGenerator::visitBinaryExpr(const BinaryExpr &expr) {
     auto chunk = getCurrentChunk();
-    compile(*expr.left);
-    compile(*expr.right);
+    compileExpr(*expr.left);
+    compileExpr(*expr.right);
     switch (expr.opr.type) {
         case TOKEN_PLUS:
             chunk->emitOpCode(OpCode::OP_ADD, expr.opr.line);
@@ -89,7 +89,7 @@ void CodeGenerator::visitBinaryExpr(const BinaryExpr &expr) {
     }
 }
 
-void CodeGenerator::compile(const Expr &expr) {
+void CodeGenerator::compileExpr(const Expr &expr) {
     expr.accept(*this);
 }
 
@@ -98,12 +98,12 @@ Chunk *CodeGenerator::getCurrentChunk() {
 }
 
 void CodeGenerator::visitExprStmt(const ExprStmt & stmt) {
-    compile(*stmt.expr);
+    compileExpr(*stmt.expr);
     getCurrentChunk()->emitOpCode(OpCode::OP_POP, stmt.line);
 }
 
 void CodeGenerator::visitPrintStmt(const PrintStmt & stmt) {
-    compile(*stmt.expr);
+    compileExpr(*stmt.expr);
     getCurrentChunk()->emitOpCode(OpCode::OP_PRINT, stmt.line);
 }
 
@@ -152,6 +152,18 @@ void CodeGenerator::visitBlockStmt(const BlockStmt &stmt) {
         statement->accept(*this);
     }
     currentCompiler->endScope();
+}
+
+void CodeGenerator::compileStmt(const Stmt &stmt) {
+    stmt.accept(*this);
+}
+
+FunctionObj *CodeGenerator::compile(const std::vector<std::unique_ptr<Stmt>> &statements) {
+    currentCompiler = std::make_shared<FunctionCompiler>(nullptr, SCRIPT_TYPE, "");
+    for(const auto& stmt: statements) {
+        stmt->accept(*this);
+    }
+    return currentCompiler->functionObj;
 }
 
 

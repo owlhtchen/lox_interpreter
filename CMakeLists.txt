@@ -15,7 +15,7 @@ set(SOURCES
         src/debug.cpp
         src/Object.cpp
         src/GarbageCollector.cpp
-        src/Compiler.cpp
+        src/FunctionCompiler.cpp
         src/Local.cpp
         src/Stmt.cpp
         )

@@ -3,10 +3,10 @@
 #define LOX_INTERPRETER_LOCAL_H
 
 #include <Token.h>
-class Compiler;
+class FunctionCompiler;
 
 class Local {
-    friend class Compiler;
+    friend class FunctionCompiler;
 private:
     Token token;
     int scopeDepth;

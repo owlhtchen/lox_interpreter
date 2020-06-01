@@ -10,17 +10,19 @@
 #include <Value.h>
 #include <Token.h>
 
-class Compiler;
+class FunctionCompiler;
 class FunctionObj;
 class StringObj;
 
 class CodeGenerator: public VisitorExpr, public VisitorStmt {
 public:
-//    Chunk chunk;
-    // code for different functions is stored in separate compiler
-    std::shared_ptr<Compiler> currentCompiler;
-    void compile(const Expr& expr);
-    FunctionObj* topFunction;
+    // Chunk chunk;
+    // one compiler for one function
+    // FunctionObj* topFunction;
+    std::shared_ptr<FunctionCompiler> currentCompiler;
+    void compileExpr(const Expr& expr);
+    void compileStmt(const Stmt& stmt);
+    FunctionObj* compile(const std::vector<std::unique_ptr<Stmt>>& statements);
 private:
     Chunk* getCurrentChunk();
     void visitLiteralExpr(const LiteralExpr& expr) override;
