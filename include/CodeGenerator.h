@@ -31,6 +31,8 @@ private:
     void visitPrintStmt(const PrintStmt& stmt) override;
     void visitVarDeclStmt(const VarDeclStmt& stmt) override;
     uint8_t parseVariable(const Token& token);
+    void defineGlobal(uint8_t varIdentifierId, int line);
+    void visitBlockStmt(const BlockStmt& stmt) override;
 };
 
 #endif //LOX_INTERPRETER_CODEGENERATOR_H

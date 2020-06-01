@@ -30,6 +30,7 @@ public:
     void emitConstantValue(const Token& token);
     void emitOpCode(OpCode opCode, int line);
     void emitOpCodes(OpCode first, OpCode second, int line);
+    void emitOpCodeByte(OpCode opCode, uint8_t operand, int line);
 
 #ifdef LOX_DEBUG
     friend void disassembleChunk(Chunk* chunk);

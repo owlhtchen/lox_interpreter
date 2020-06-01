@@ -68,6 +68,7 @@ private:
     Chunk chunk;
 public:
     FunctionObj(std::string name, int arity): name(std::move(name)), arity(arity){ };
+    Chunk* getChunk() { return &chunk; };
 
 };
 

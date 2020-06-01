@@ -108,21 +108,50 @@ void CodeGenerator::visitPrintStmt(const PrintStmt & stmt) {
 }
 
 void CodeGenerator::visitVarDeclStmt(const VarDeclStmt &stmt) {
-    // declare var: 1. global: do nothing, 2. local: addLocal to currentCompiler->locals (depth -1)
+    // declare var: 1. global (stored in a table/map): do nothing,
+    // 2. local (stored on stack): addLocal to currentCompiler->locals (depth -1)
+    auto index = parseVariable(stmt.varToken);
 
-    // define var: default value null, 1. global: set global map
-    // 2. local: set depth in currentCompiler->locals (markInitialized)
-
+    if(stmt.expr) {
+        stmt.expr->accept(*this);
+    } else {
+        getCurrentChunk()->emitOpCode(OpCode::OP_NIL, stmt.varToken.line);
+    }
+    // define var: default value null,
+    // 1. global: emit OpCode and varIdentifier_index in constants (to set global map)
+    // 2. local: just leave the init_expression value on the stack
+    // (set depth in currentCompiler->locals (markDefined))
+    if(currentCompiler->currentScopeDepth == 0) {
+        currentCompiler->markDefined();
+    } else {
+        defineGlobal(index, stmt.varToken.line);
+    }
 }
 
 uint8_t CodeGenerator::parseVariable(const Token& token) {
     if(currentCompiler->currentScopeDepth == 0) {
-
+        // declare local variable in currentCompiler->locals
+        currentCompiler->declareLocal(token);
         return 0;
     } else {
         StringObj* stringObj = StringPool::getInstance().getStringObj(token.lexeme);
         return getCurrentChunk()->addConstant(stringObj);
     }
+}
+
+void CodeGenerator::defineGlobal(uint8_t varIdentifierId, int line) {
+    if(currentCompiler->currentScopeDepth > 0) {
+        return;
+    }
+    getCurrentChunk()->emitOpCodeByte(OpCode::OP_SET_GLOBAL, varIdentifierId, line);
+}
+
+void CodeGenerator::visitBlockStmt(const BlockStmt &stmt) {
+    currentCompiler->beginScope();
+    for(const auto & statement : stmt.statements) {
+        statement->accept(*this);
+    }
+    currentCompiler->endScope();
 }
 
 

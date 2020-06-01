@@ -14,3 +14,7 @@ void PrintStmt::accept(VisitorStmt &visitor) {
 void VarDeclStmt::accept(VisitorStmt &visitor) {
     visitor.visitVarDeclStmt(*this);
 }
+
+void BlockStmt::accept(VisitorStmt &visitor) {
+    visitor.visitBlockStmt(*this);
+}

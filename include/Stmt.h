@@ -4,6 +4,7 @@
 
 #include <Token.h>
 #include <memory>
+#include <vector>
 
 class Expr;
 class VisitorStmt;
@@ -36,6 +37,12 @@ public:
     std::unique_ptr<Expr> expr;
     explicit VarDeclStmt(Token varToken, std::unique_ptr<Expr> expr):
         varToken(std::move(varToken)), expr(std::move(expr)) { };
+    void accept(VisitorStmt& visitor) override;
+};
+
+class BlockStmt: public Stmt {
+public:
+    std::vector<std::unique_ptr<Stmt>> statements;
     void accept(VisitorStmt& visitor) override;
 };
 

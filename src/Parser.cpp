@@ -132,11 +132,22 @@ std::unique_ptr<Stmt> Parser::statement() {
         auto expr = expression();
         consume(TOKEN_SEMICOLON, "expected ;");
         return std::make_unique<PrintStmt>(std::move(expr), tokens[current - 1].line);
+    } else if (match(TOKEN_LEFT_BRACE)) {
+        return block();
     } else { // exprStmt;
         auto expr = expression();
         consume(TOKEN_SEMICOLON, "expected ;");
         return std::make_unique<ExprStmt>(std::move(expr), tokens[current - 1].line);
     }
+}
+
+std::unique_ptr<Stmt> Parser::block() {
+    std::unique_ptr<BlockStmt> blockStmt(new BlockStmt);
+    while(!isAtEnd() && peek(0).type != TOKEN_RIGHT_BRACE) {
+        blockStmt->statements.push_back(statement());
+    }
+    consume(TOKEN_RIGHT_BRACE, " unclosed block, expected }");
+    return blockStmt;
 }
 
 
