@@ -131,11 +131,11 @@ std::unique_ptr<Stmt> Parser::statement() {
     if(match(TOKEN_PRINT)) { // printStmt;
         auto expr = expression();
         consume(TOKEN_SEMICOLON, "expected ;");
-        return std::make_unique<PrintStmt>(std::move(expr));
+        return std::make_unique<PrintStmt>(std::move(expr), tokens[current - 1].line);
     } else { // exprStmt;
         auto expr = expression();
         consume(TOKEN_SEMICOLON, "expected ;");
-        return std::make_unique<ExprStmt>(std::move(expr));
+        return std::make_unique<ExprStmt>(std::move(expr), tokens[current - 1].line);
     }
 }
 

@@ -9,7 +9,7 @@ class VisitorExpr;
 
 class Expr {
 public:
-    virtual void accept(VisitorExpr& visitor) = 0;
+    virtual void accept(VisitorExpr& visitor) const = 0;
     virtual ~Expr() = default;
 };
 
@@ -20,7 +20,7 @@ public:
 //    Value value;
     Token token;
     explicit LiteralExpr(const Token& token);
-    void accept(VisitorExpr& visitor) override ;
+    void accept(VisitorExpr& visitor) const override ;
     ~LiteralExpr() override = default;
 };
 
@@ -30,7 +30,7 @@ public:
     std::unique_ptr<Expr> right;
     UnaryExpr(Token opr, std::unique_ptr<Expr> right):
         opr(std::move(opr)), right(std::move(right)) {};
-    void accept(VisitorExpr& visitor) override ;
+    void accept(VisitorExpr& visitor) const override ;
     ~UnaryExpr() override = default;
 };
 
@@ -38,7 +38,7 @@ class GroupingExpr: public Expr {
 public:
     std::unique_ptr<Expr> innerExpr;
     explicit GroupingExpr(std::unique_ptr<Expr> innerExpr): innerExpr(std::move(innerExpr)) {};
-    void accept(VisitorExpr& visitor) override ;
+    void accept(VisitorExpr& visitor) const override ;
     ~GroupingExpr() override = default;
 };
 
@@ -49,7 +49,7 @@ public:
     std::unique_ptr<Expr> right;
     explicit BinaryExpr(Token opr, std::unique_ptr<Expr> left, std::unique_ptr<Expr> right):
         opr(std::move(opr)), left(std::move(left)), right(std::move(right)) {};
-    void accept(VisitorExpr& visitor) override ;
+    void accept(VisitorExpr& visitor) const override ;
     ~BinaryExpr() override = default;
 };
 

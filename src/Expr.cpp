@@ -16,18 +16,18 @@ LiteralExpr::LiteralExpr(const Token& token):token(token) {
     }
 }
 
-void LiteralExpr::accept(VisitorExpr& visitor) {
+void LiteralExpr::accept(VisitorExpr& visitor) const {
     visitor.visitLiteralExpr(*this);
 }
 
-void UnaryExpr::accept(VisitorExpr& visitor) {
+void UnaryExpr::accept(VisitorExpr& visitor) const {
     visitor.visitUnaryExpr(*this);
 }
 
-void GroupingExpr::accept(VisitorExpr& visitor) {
+void GroupingExpr::accept(VisitorExpr& visitor) const {
     visitor.visitGroupingExpr(*this);
 }
 
-void BinaryExpr::accept(VisitorExpr& visitor) {
+void BinaryExpr::accept(VisitorExpr& visitor) const {
     visitor.visitBinaryExpr(*this);
 }

@@ -23,10 +23,10 @@ private:
     std::vector<uint8_t> code;
     std::vector<int> lines;
     std::vector<Value> constants;
-    uint8_t addConstant(Value value);
 public:
     void emitByte(uint8_t byte, int line);
     void emitBytes(uint8_t first, uint8_t second, int line);
+    uint8_t addConstant(Value value);
     void emitConstantValue(const Token& token);
     void emitOpCode(OpCode opCode, int line);
     void emitOpCodes(OpCode first, OpCode second, int line);

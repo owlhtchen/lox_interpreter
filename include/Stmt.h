@@ -17,14 +17,16 @@ public:
 class ExprStmt: public Stmt {
 public:
     std::unique_ptr<Expr> expr;
-    explicit ExprStmt(std::unique_ptr<Expr> expr): expr(std::move(expr)) { };
+    int line;
+    explicit ExprStmt(std::unique_ptr<Expr> expr, int line): expr(std::move(expr)), line(line) { };
     void accept(VisitorStmt& visitor) override;
 };
 
 class PrintStmt: public Stmt {
 public:
     std::unique_ptr<Expr> expr;
-    explicit PrintStmt(std::unique_ptr<Expr> expr): expr(std::move(expr)) { };
+    int line;
+    explicit PrintStmt(std::unique_ptr<Expr> expr, int line): expr(std::move(expr)), line(line) { };
     void accept(VisitorStmt& visitor) override;
 };
 

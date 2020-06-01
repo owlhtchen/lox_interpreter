@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <Compiler.h>
 #include <Object.h>
+#include <Stmt.h>
+#include <Object.h>
 
 void CodeGenerator::visitLiteralExpr(const LiteralExpr &expr) {
     auto line = expr.token.line;
@@ -87,7 +89,7 @@ void CodeGenerator::visitBinaryExpr(const BinaryExpr &expr) {
     }
 }
 
-void CodeGenerator::compile(Expr &expr) {
+void CodeGenerator::compile(const Expr &expr) {
     expr.accept(*this);
 }
 
@@ -95,14 +97,32 @@ Chunk *CodeGenerator::getCurrentChunk() {
     return &currentCompiler->functionObj->chunk;
 }
 
-void CodeGenerator::visitExprStmt(const ExprStmt &expr) {
+void CodeGenerator::visitExprStmt(const ExprStmt & stmt) {
+    compile(*stmt.expr);
+    getCurrentChunk()->emitOpCode(OpCode::OP_POP, stmt.line);
+}
+
+void CodeGenerator::visitPrintStmt(const PrintStmt & stmt) {
+    compile(*stmt.expr);
+    getCurrentChunk()->emitOpCode(OpCode::OP_PRINT, stmt.line);
+}
+
+void CodeGenerator::visitVarDeclStmt(const VarDeclStmt &stmt) {
+    // declare var: 1. global: do nothing, 2. local: addLocal to currentCompiler->locals (depth -1)
+
+    // define var: default value null, 1. global: set global map
+    // 2. local: set depth in currentCompiler->locals (markInitialized)
 
 }
 
-void CodeGenerator::visitPrintStmt(const PrintStmt &expr) {
+uint8_t CodeGenerator::parseVariable(const Token& token) {
+    if(currentCompiler->currentScopeDepth == 0) {
 
+        return 0;
+    } else {
+        StringObj* stringObj = StringPool::getInstance().getStringObj(token.lexeme);
+        return getCurrentChunk()->addConstant(stringObj);
+    }
 }
 
-void CodeGenerator::visitVarDeclStmt(const VarDeclStmt &expr) {
 
-}
