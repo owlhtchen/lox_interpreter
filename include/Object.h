@@ -7,9 +7,11 @@
 #include <string>
 #include <unordered_map>
 #include <Chunk.h>
+#include <Value.h>
 
 class GarbageCollector;
 class CodeGenerator;
+class CallFrame;
 
 class Object {
     friend class GarbageCollector;
@@ -41,6 +43,7 @@ public:
 
 class StringObj: public Object {
     friend class VM;
+    friend class CallFrame;
 private:
     std::string str;
 public:
@@ -58,6 +61,14 @@ public:
     StringObj* getStringObj(const std::string& str);  // non-static
 };
 
+class FunctionObj;
+
+class CallableObj {
+public:
+    virtual Value getThis() = 0;
+    virtual FunctionObj* getClosure() = 0;
+};
+
 class FunctionObj: public Object {
     friend class GarbageCollector;
     friend class CodeGenerator;
@@ -69,8 +80,7 @@ private:
 public:
     explicit FunctionObj(std::string name = ""): name(std::move(name)), arity(0){ };
 //    FunctionObj(): name(""), arity(0) { };
-    Chunk* getChunk() { return &chunk; };
-
+    Chunk& getChunk() { return chunk; };
 };
 
 #endif //LOX_INTERPRETER_OBJECT_H

@@ -15,8 +15,8 @@ private:
     int current;
     std::vector<Token> tokens;
     bool hasError;
-    std::vector<std::unique_ptr<Stmt>> statements;
 public:
+    std::vector<std::unique_ptr<Stmt>> statements;
     explicit Parser(std::vector<Token> tokens):
         current(0), tokens(std::move(tokens)), hasError(false) {};
     void parse();

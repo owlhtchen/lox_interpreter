@@ -18,6 +18,7 @@ set(SOURCES
         src/FunctionCompiler.cpp
         src/Local.cpp
         src/Stmt.cpp
+        src/CallFrame.cpp
         )
 
 add_executable(lox_interpreter ${SOURCES})

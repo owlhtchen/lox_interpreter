@@ -15,10 +15,12 @@
 #endif
 
 class VM;
+class CallFrame;
 // using ValueArray = std::vector<Value>;
 
 class Chunk{
     friend class VM;
+    friend class CallFrame;
 private:
     std::vector<uint8_t> code;
     std::vector<int> lines;

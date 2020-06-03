@@ -1,5 +1,6 @@
 #include <Object.h>
 #include <GarbageCollector.h>
+#include <variant>
 
 Object::Object(): isMarked(true), next(nullptr) {
     // TODO: call gc if necessary

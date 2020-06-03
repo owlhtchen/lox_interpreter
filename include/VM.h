@@ -4,28 +4,22 @@
 
 #include <vector>
 #include <cstdint>
-#include <Chunk.h>
-#include <Value.h>
-#include <OpCode.h>
+#include <CallFrame.h>
 
 class Object;
+class CallableObj;
 
 class VM {
+    friend class CallFrame;
 private:
-    Chunk chunk;
-    int ip;
+//    Chunk chunk;
+//    int ip;
+    std::vector<CallFrame> callFrames;
     std::vector<Value> stack;
 public:
     // should take in a functionObj
-    explicit VM(Chunk chunk): chunk(std::move(chunk)), ip(0) { };
-    void run();
-    Chunk& getCurrentChunk();
-    uint8_t readByte();
-    OpCode readOpCode();
-    Value readConstant();
-    Value peekStack(int relative_pos);
-    int getCurrentLine();
-    Value popStack();
+    explicit VM() = default;
+//    void setUpFunctionCall(CallableObj* callableObj, int argCount);
 };
 
 
