@@ -62,8 +62,8 @@ void run(std::string source, bool exit_on_error) {
         parser.parse();
         CodeGenerator codeGenerator;
         auto functionObj = codeGenerator.compile(parser.statements);
-//        VM vm;
-//        vm.run();
+        VM vm;
+        vm.start(functionObj);
 //        auto other = vm;  // breakpoint here: check vm.stack
 //        GarbageCollector::getInstance().freeAllObjects();
 

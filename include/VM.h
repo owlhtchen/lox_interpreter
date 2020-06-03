@@ -5,9 +5,12 @@
 #include <vector>
 #include <cstdint>
 #include <CallFrame.h>
+#include "Object.h"
+
 
 class Object;
 class CallableObj;
+class FunctionObj;
 
 class VM {
     friend class CallFrame;
@@ -19,7 +22,10 @@ private:
 public:
     // should take in a functionObj
     explicit VM() = default;
-//    void setUpFunctionCall(CallableObj* callableObj, int argCount);
+    int createCallFrame(FunctionObj* callableObj, int stackBase);
+    void setUpFunctionCall(FunctionObj* callableObj, int argCount);
+    void start(FunctionObj* functionObj);
+    void run();
 };
 
 

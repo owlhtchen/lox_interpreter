@@ -3,8 +3,11 @@
 #include <Object.h>
 #include <VM.h>
 #include <util.h>
+#include <Value.h>
+#include <iostream>
+#include <stdexcept>
 
-void CallFrame::run() {
+void CallFrame::runFrame() {
     OpCode currentOpcode;
     Value second, first;
     auto& chunk = getCurrentChunk();
@@ -107,6 +110,18 @@ void CallFrame::run() {
                     throw RuntimeError(getCurrentLine(), "<, > opr only support number");
                 }
                 break;
+            }
+            case OpCode::OP_POP: {
+                popStack();
+                break;
+            }
+            case OpCode::OP_PRINT: {
+                auto value = popStack();
+                std::cout << toString(value) << std::endl;
+                break;
+            }
+            default: {
+                throw std::logic_error("unhandle Opcode in CallFrame");
             }
         }
     }

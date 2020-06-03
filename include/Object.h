@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <Chunk.h>
 #include <Value.h>
+#include <string>
 
 class GarbageCollector;
 class CodeGenerator;
@@ -39,6 +40,7 @@ public:
     T* dyn_cast() {
         return dynamic_cast<T*>(this);
     }
+    virtual std::string toString() = 0;
 };
 
 class StringObj: public Object {
@@ -48,6 +50,7 @@ private:
     std::string str;
 public:
     explicit StringObj(std::string str): str(std::move(str)) {};
+    std::string toString() override ;
 };
 
 class StringPool {
@@ -63,11 +66,11 @@ public:
 
 class FunctionObj;
 
-class CallableObj {
-public:
-    virtual Value getThis() = 0;
-    virtual FunctionObj* getClosure() = 0;
-};
+//class CallableObj {
+//public:
+//    virtual Value getThis() = 0;
+//    virtual FunctionObj* getClosure() = 0;
+//};
 
 class FunctionObj: public Object {
     friend class GarbageCollector;
@@ -81,6 +84,7 @@ public:
     explicit FunctionObj(std::string name = ""): name(std::move(name)), arity(0){ };
 //    FunctionObj(): name(""), arity(0) { };
     Chunk& getChunk() { return chunk; };
+    std::string toString() override ;
 };
 
 #endif //LOX_INTERPRETER_OBJECT_H

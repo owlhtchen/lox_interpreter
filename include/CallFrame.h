@@ -12,20 +12,22 @@ class FunctionObj;
 class VM;
 
 class CallFrame {
+    friend class VM;
 private:
     FunctionObj* functionObj;
     int ip;
     int stackBase;
     //vm: a reference to the vm which contains this CallFrame
     VM & vm;
-    // CallFrame can only be constructed in the conta
+public:
+    // CallFrame should only be constructed with the containing VM
     CallFrame(FunctionObj* functionObj, int stackBase, VM& vm):
             functionObj(functionObj), stackBase(stackBase), ip(0), vm(vm) { };
-public:
+
     // runFrame: when it gets OpCall, it sets up the frame and return to the containing VM
     // VM will then run the topmost frame on callFrames,
-    // runFrame also returns to containing VM when it gets OpReturn
-    void run();
+    // when VM gets OpReturn, runFrame pops the current callFrame returns to containing VM
+    void runFrame();
     Chunk& getCurrentChunk();
     uint8_t readByte();
     OpCode readOpCode();

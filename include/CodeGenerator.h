@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include <Value.h>
 #include <Token.h>
+#include "Object.h"
+
 
 class FunctionCompiler;
 class FunctionObj;

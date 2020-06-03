@@ -42,3 +42,11 @@ StringObj *StringPool::getStringObj(const std::string& str) {
         return ptr->second;
     }
 }
+
+std::string StringObj::toString() {
+    return str;
+}
+
+std::string FunctionObj::toString() {
+    return "function " + name;
+}
