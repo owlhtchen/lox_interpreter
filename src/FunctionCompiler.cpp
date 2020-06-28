@@ -40,11 +40,13 @@ void FunctionCompiler::beginScope() {
     currentScopeDepth++;
 }
 
-void FunctionCompiler::endScope() {
+void FunctionCompiler::endScope(int endLine) {
     currentScopeDepth--;
+    auto& chunk = functionObj->getChunk();
     while (locals.size() >= 0 &&
     locals.back().scopeDepth > currentScopeDepth) {
         locals.pop_back();
+        chunk.emitOpCode(OpCode::OP_POP, endLine);
     }
 }
 
@@ -59,3 +61,16 @@ FunctionCompiler::FunctionCompiler(std::shared_ptr<FunctionCompiler> enclosing, 
     }
 }
 
+int FunctionCompiler::resolveLocal(const Token& varName) {
+    for(int i = 0; i < locals.size(); i++) {
+        if(varName.lexeme == locals[i].token.lexeme) {
+            if (locals[i].scopeDepth < 0) {
+                throw RuntimeError(varName.line, "variable " + varName.lexeme
+                + " is declared but not defined");
+            } else {
+                return i;
+            }
+        }
+    }
+    return -1;
+}

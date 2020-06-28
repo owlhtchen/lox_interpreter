@@ -9,6 +9,7 @@
 #include <Chunk.h>
 #include <Value.h>
 #include <string>
+#include <stdexcept>
 
 class GarbageCollector;
 class CodeGenerator;
@@ -35,6 +36,7 @@ public:
         if(this->isa<T>()) {
             return static_cast<T*>(this);
         }
+        throw std::logic_error("cast to wrong type in Object.cast");
     }
     template <typename T>
     T* dyn_cast() {

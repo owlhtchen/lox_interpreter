@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <CallFrame.h>
 #include "Object.h"
-
+#include <unordered_map>
 
 class Object;
 class CallableObj;
@@ -19,6 +19,7 @@ private:
 //    int ip;
     std::vector<CallFrame> callFrames;
     std::vector<Value> stack;
+    std::unordered_map<StringObj*, Value> globals;
 public:
     // should take in a functionObj
     explicit VM() = default;

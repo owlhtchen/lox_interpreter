@@ -66,7 +66,7 @@ std::unique_ptr<Expr> Parser::unary() {
 }
 
 std::unique_ptr<Expr> Parser::primary() {
-    if(match({TOKEN_NUMBER, TOKEN_STRING, TOKEN_TRUE, TOKEN_FALSE, TOKEN_NIL})) {
+    if(match({TOKEN_NUMBER, TOKEN_STRING, TOKEN_TRUE, TOKEN_FALSE, TOKEN_NIL, TOKEN_IDENTIFIER})) {
         Token literal = peek(-1);
         return std::make_unique<LiteralExpr>(literal);
     } else if(match(TOKEN_LEFT_PAREN)) {
@@ -133,7 +133,7 @@ std::unique_ptr<Stmt> Parser::statement() {
         consume(TOKEN_SEMICOLON, "expected ;");
         return std::make_unique<PrintStmt>(std::move(expr), tokens[current - 1].line);
     } else if (match(TOKEN_LEFT_BRACE)) {
-        return block();
+        return block(peek(-1).line);
     } else { // exprStmt;
         auto expr = expression();
         consume(TOKEN_SEMICOLON, "expected ;");
@@ -141,12 +141,14 @@ std::unique_ptr<Stmt> Parser::statement() {
     }
 }
 
-std::unique_ptr<Stmt> Parser::block() {
+std::unique_ptr<Stmt> Parser::block(int begin) {
     std::unique_ptr<BlockStmt> blockStmt(new BlockStmt);
+    blockStmt->begin = begin;
     while(!isAtEnd() && peek(0).type != TOKEN_RIGHT_BRACE) {
         blockStmt->statements.push_back(statement());
     }
     consume(TOKEN_RIGHT_BRACE, " unclosed block, expected }");
+    blockStmt->end = peek(-1).line;
     return blockStmt;
 }
 

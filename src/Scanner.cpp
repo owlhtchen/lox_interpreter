@@ -30,6 +30,8 @@ std::vector<Token> Scanner::scanTokens() {
         } else if(token.type == TOKEN_ERROR) {
             hasError = true;
             return std::vector<Token>{token};
+        } else if(token.type == TOKEN_EOF) {
+            break;
         }
         tokens.push_back(token);
     }

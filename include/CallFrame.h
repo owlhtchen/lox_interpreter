@@ -19,11 +19,10 @@ private:
     int stackBase;
     //vm: a reference to the vm which contains this CallFrame
     VM & vm;
-public:
     // CallFrame should only be constructed with the containing VM
     CallFrame(FunctionObj* functionObj, int stackBase, VM& vm):
             functionObj(functionObj), stackBase(stackBase), ip(0), vm(vm) { };
-
+public:
     // runFrame: when it gets OpCall, it sets up the frame and return to the containing VM
     // VM will then run the topmost frame on callFrames,
     // when VM gets OpReturn, runFrame pops the current callFrame returns to containing VM

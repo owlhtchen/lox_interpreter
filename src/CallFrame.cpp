@@ -120,6 +120,11 @@ void CallFrame::runFrame() {
                 std::cout << toString(value) << std::endl;
                 break;
             }
+            case OpCode::OP_DEFINE_GLOBAL: {
+                StringObj* varName = std::get<Object*>(readConstant())->cast<StringObj>();
+                vm.globals[varName] = popStack();
+                break;
+            }
             default: {
                 throw std::logic_error("unhandle Opcode in CallFrame");
             }

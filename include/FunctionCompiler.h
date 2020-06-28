@@ -9,10 +9,12 @@
 #include <FunctionType.h>
 
 class FunctionObj;
+class Token;
 
 class FunctionCompiler {
 public:
-    explicit FunctionCompiler(std::shared_ptr<FunctionCompiler> enclosing, FunctionType funcType, std::string funcName = "");
+    explicit FunctionCompiler(std::shared_ptr<FunctionCompiler> enclosing,
+            FunctionType funcType, std::string funcName = "");
     std::shared_ptr<FunctionCompiler> enclosing;
     FunctionObj* functionObj;
     //locals: this gives the index localVariables in CallFrame during runtime
@@ -24,7 +26,8 @@ public:
     void addLocal(const Token& token);
     void markDefined();
     void beginScope();
-    void endScope();
+    void endScope(int endLine);
+    int resolveLocal(const Token& varName);
 };
 
 

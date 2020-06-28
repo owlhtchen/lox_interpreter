@@ -21,10 +21,16 @@ void CodeGenerator::visitLiteralExpr(const LiteralExpr &expr) {
         case TOKEN_NIL:
             chunk->emitOpCode(OpCode::OP_NIL, line);
             break;
-        case TOKEN_STRING:
         case TOKEN_NUMBER:
+        case TOKEN_STRING:
             chunk->emitConstantValue(expr.token);
             break;
+        case TOKEN_IDENTIFIER: {
+            if(currentCompiler->resolveLocal(expr.token)) {
+                
+            }
+            break;
+        }
         default:
             throw std::logic_error("unhandled literal expr type in visitLiteralExpr");
     }
@@ -143,7 +149,7 @@ void CodeGenerator::defineGlobal(uint8_t varIdentifierId, int line) {
     if(currentCompiler->currentScopeDepth > 0) {
         return;
     }
-    getCurrentChunk()->emitOpCodeByte(OpCode::OP_SET_GLOBAL, varIdentifierId, line);
+    getCurrentChunk()->emitOpCodeByte(OpCode::OP_DEFINE_GLOBAL, varIdentifierId, line);
 }
 
 void CodeGenerator::visitBlockStmt(const BlockStmt &stmt) {
@@ -151,7 +157,7 @@ void CodeGenerator::visitBlockStmt(const BlockStmt &stmt) {
     for(const auto & statement : stmt.statements) {
         statement->accept(*this);
     }
-    currentCompiler->endScope();
+    currentCompiler->endScope(stmt.end);
 }
 
 void CodeGenerator::compileStmt(const Stmt &stmt) {

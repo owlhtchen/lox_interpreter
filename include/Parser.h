@@ -29,7 +29,7 @@ public:
     std::unique_ptr<Expr> primary();
     std::unique_ptr<Stmt> declaration();
     std::unique_ptr<Stmt> statement();
-    std::unique_ptr<Stmt> block();
+    std::unique_ptr<Stmt> block(int begin);
     bool isAtEnd();
     bool match(TokenType type);
     bool match(std::initializer_list<TokenType> types); // e.g. checkType({TOKEN_MINUS, TOKEN_BANG})

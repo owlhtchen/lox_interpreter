@@ -42,6 +42,7 @@ public:
 
 class BlockStmt: public Stmt {
 public:
+    int begin, end;
     std::vector<std::unique_ptr<Stmt>> statements;
     void accept(VisitorStmt& visitor) const override;
 };

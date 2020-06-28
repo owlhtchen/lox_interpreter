@@ -9,6 +9,6 @@ class Object;
 
 using Value = std::variant<std::monostate, double, bool, Object*>;
 
-std::string toString(Value value);
+std::string toString(Value value);  // for display
 
 #endif //LOX_INTERPRETER_VALUE_H

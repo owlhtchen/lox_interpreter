@@ -4,7 +4,7 @@
 
 
 int VM::createCallFrame(FunctionObj* callableObj, int stackBase) {
-    callFrames.emplace_back(callableObj, stackBase, *this);
+    callFrames.push_back(CallFrame(callableObj, stackBase, *this));
     return callFrames.size() - 1;
 }
 
