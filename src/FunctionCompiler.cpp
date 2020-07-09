@@ -62,7 +62,7 @@ FunctionCompiler::FunctionCompiler(std::shared_ptr<FunctionCompiler> enclosing, 
 }
 
 int FunctionCompiler::resolveLocal(const Token& varName) {
-    for(int i = 0; i < locals.size(); i++) {
+    for(auto i = locals.size() - 1; i >= 0; i--) {
         if(varName.lexeme == locals[i].token.lexeme) {
             if (locals[i].scopeDepth < 0) {
                 throw RuntimeError(varName.line, "variable " + varName.lexeme

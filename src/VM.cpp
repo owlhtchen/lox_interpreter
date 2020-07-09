@@ -16,6 +16,8 @@ void VM::setUpFunctionCall(FunctionObj *functionObj, int argCount) {
 
 void VM::run() {
     while (!callFrames.empty()) {
+        // runFrame returns when it needs to start a new function call (needs a new CallFrame)
+        // i.e. it gets OP_RETURN or OP_CALL
         callFrames.back().runFrame();
     }
 }

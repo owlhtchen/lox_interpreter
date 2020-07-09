@@ -26,8 +26,13 @@ void CodeGenerator::visitLiteralExpr(const LiteralExpr &expr) {
             chunk->emitConstantValue(expr.token);
             break;
         case TOKEN_IDENTIFIER: {
-            if(currentCompiler->resolveLocal(expr.token)) {
-                
+            int localIndex = currentCompiler->resolveLocal(expr.token);
+            if(localIndex >= 0) {
+                chunk->emitOpCodeByte(OpCode::OP_GET_LOCAL, localIndex, line);
+            } else {
+                StringObj* varName = StringPool::getInstance().getStringObj(expr.token.lexeme);
+                uint8_t globalIndex = chunk->addConstant(varName);
+                chunk->emitOpCodeByte(OpCode::OP_GET_GLOBAL, globalIndex, line);
             }
             break;
         }
@@ -114,27 +119,22 @@ void CodeGenerator::visitPrintStmt(const PrintStmt & stmt) {
 }
 
 void CodeGenerator::visitVarDeclStmt(const VarDeclStmt &stmt) {
-    // declare var: 1. global (stored in a table/map): do nothing,
-    // 2. local (stored on stack): addLocal to currentCompiler->locals (depth -1)
-    auto index = parseVariable(stmt.varToken);
+    auto index = declareVariable(stmt.varToken);
 
+    // initial value of variable is loaded onto the stack
     if(stmt.expr) {
         stmt.expr->accept(*this);
     } else {
+        // default value null
         getCurrentChunk()->emitOpCode(OpCode::OP_NIL, stmt.varToken.line);
     }
-    // define var: default value null,
-    // 1. global: emit OpCode and varIdentifier_index in constants (to set global map)
-    // 2. local: just leave the init_expression value on the stack
-    // (set depth in currentCompiler->locals (markDefined))
-    if(currentCompiler->currentScopeDepth == 0) {
-        currentCompiler->markDefined();
-    } else {
-        defineGlobal(index, stmt.varToken.line);
-    }
+
+    defineVariable(index, stmt.varToken.line);
 }
 
-uint8_t CodeGenerator::parseVariable(const Token& token) {
+uint8_t CodeGenerator::declareVariable(const Token& token) {
+    // declare var: 1. global (stored variable name in a table/map): do nothing,
+    // 2. local (stored on stack): addLocal to currentCompiler->locals (depth -1)
     if(currentCompiler->currentScopeDepth == 0) {
         // declare local variable in currentCompiler->locals
         currentCompiler->declareLocal(token);
@@ -142,6 +142,17 @@ uint8_t CodeGenerator::parseVariable(const Token& token) {
     } else {
         StringObj* stringObj = StringPool::getInstance().getStringObj(token.lexeme);
         return getCurrentChunk()->addConstant(stringObj);
+    }
+}
+
+void CodeGenerator::defineVariable(uint8_t varNameIndex, int line) {
+    // 1. global: emit OpCode and varIdentifier_index in constants (to set global map)
+    // 2. local: just leave the init_expression value on the stack
+    // (set depth in currentCompiler->locals (markDefined))
+    if(currentCompiler->currentScopeDepth != 0) {
+        currentCompiler->markDefined();
+    } else {
+        defineGlobal(varNameIndex, line);
     }
 }
 
@@ -169,7 +180,15 @@ FunctionObj *CodeGenerator::compile(const std::vector<std::unique_ptr<Stmt>> &st
     for(const auto& stmt: statements) {
         stmt->accept(*this);
     }
-    return currentCompiler->functionObj;
+    int lastLine = statements.empty()? 0 : statements.back()->getLastLine();
+    return endCurrentCompiler(lastLine);
+}
+
+FunctionObj *CodeGenerator::endCurrentCompiler(int line) {
+    getCurrentChunk()->emitByte(static_cast<uint8_t>(OpCode::OP_RETURN), line);
+    auto temp = currentCompiler->functionObj;
+    currentCompiler = currentCompiler->enclosing;
+    return temp;
 }
 
 

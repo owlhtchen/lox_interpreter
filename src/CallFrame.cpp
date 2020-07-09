@@ -120,9 +120,24 @@ void CallFrame::runFrame() {
                 std::cout << toString(value) << std::endl;
                 break;
             }
+            case OpCode::OP_RETURN: {
+                vm.callFrames.pop_back();
+                return;
+                break;
+            }
             case OpCode::OP_DEFINE_GLOBAL: {
                 StringObj* varName = std::get<Object*>(readConstant())->cast<StringObj>();
                 vm.globals[varName] = popStack();
+                break;
+            }
+            case OpCode::OP_GET_GLOBAL: {
+                StringObj* varName = std::get<Object*>(readConstant())->cast<StringObj>();
+                pushStack(varName);
+                break;
+            }
+            case OpCode::OP_GET_LOCAL: {
+                uint8_t stackIndex = readByte();
+                pushStack(peekStack(stackIndex));
                 break;
             }
             default: {

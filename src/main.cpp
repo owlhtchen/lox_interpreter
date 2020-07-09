@@ -64,11 +64,11 @@ void run(std::string source, bool exit_on_error) {
         auto functionObj = codeGenerator.compile(parser.statements);
         VM vm;
         vm.start(functionObj);
-//        auto other = vm;  // breakpoint here: check vm.stack
-//        GarbageCollector::getInstance().freeAllObjects();
+        auto other = vm;  // breakpoint here: check vm.stack
+        GarbageCollector::getInstance().freeAllObjects();
 
     }
-
+    std::cout << " --- run successful --- " << std::endl;
 }
 #endif
 
