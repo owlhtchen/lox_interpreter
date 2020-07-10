@@ -5,6 +5,7 @@
 #include <Error.h>
 #include <Object.h>
 #include <GarbageCollector.h>
+#include <iostream>
 
 void FunctionCompiler::declareLocal(const Token &token) {
     if(currentScopeDepth == 0) {
@@ -62,7 +63,8 @@ FunctionCompiler::FunctionCompiler(std::shared_ptr<FunctionCompiler> enclosing, 
 }
 
 int FunctionCompiler::resolveLocal(const Token& varName) {
-    for(auto i = locals.size() - 1; i >= 0; i--) {
+//    for(auto i = locals.size() - 1; i >= 0; i--) {  DO NOT use auto here (auto is size_t, unsigned int, i-- doesn't work)
+    for(int i = locals.size() - 1; i >= 0; i--) {
         if(varName.lexeme == locals[i].token.lexeme) {
             if (locals[i].scopeDepth < 0) {
                 throw RuntimeError(varName.line, "variable " + varName.lexeme

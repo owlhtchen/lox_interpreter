@@ -7,6 +7,7 @@
 #include <Object.h>
 #include <Stmt.h>
 #include <Object.h>
+#include <iostream>
 
 void CodeGenerator::visitLiteralExpr(const LiteralExpr &expr) {
     auto line = expr.token.line;
@@ -135,7 +136,7 @@ void CodeGenerator::visitVarDeclStmt(const VarDeclStmt &stmt) {
 uint8_t CodeGenerator::declareVariable(const Token& token) {
     // declare var: 1. global (stored variable name in a table/map): do nothing,
     // 2. local (stored on stack): addLocal to currentCompiler->locals (depth -1)
-    if(currentCompiler->currentScopeDepth == 0) {
+    if(currentCompiler->currentScopeDepth > 0) {
         // declare local variable in currentCompiler->locals
         currentCompiler->declareLocal(token);
         return 0;

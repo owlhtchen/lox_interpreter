@@ -76,7 +76,8 @@ std::unique_ptr<Expr> Parser::primary() {
     }
 
     throw std::logic_error("primary nullptr in parser: with token "
-          + tokens[current].lexeme + " of type: " + std::to_string(tokens[current].type));
+          + tokens[current].lexeme + " of type: " + std::to_string(tokens[current].type) + " on line "
+          + std::to_string(tokens[current].line));
 }
 
 bool Parser::isAtEnd() {
@@ -121,6 +122,7 @@ std::unique_ptr<Stmt> Parser::declaration() {
         if(match(TOKEN_EQUAL)) {
             expr = expression();
         }
+        current++; // consume ; at the end
         return std::make_unique<VarDeclStmt>(varToken, std::move(expr));
     } else { // statement
         return statement();

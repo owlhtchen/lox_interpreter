@@ -132,7 +132,7 @@ void CallFrame::runFrame() {
             }
             case OpCode::OP_GET_GLOBAL: {
                 StringObj* varName = std::get<Object*>(readConstant())->cast<StringObj>();
-                pushStack(varName);
+                pushStack(vm.globals[varName]);
                 break;
             }
             case OpCode::OP_GET_LOCAL: {
