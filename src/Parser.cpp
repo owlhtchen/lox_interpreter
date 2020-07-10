@@ -147,7 +147,7 @@ std::unique_ptr<Stmt> Parser::block(int begin) {
     std::unique_ptr<BlockStmt> blockStmt(new BlockStmt);
     blockStmt->begin = begin;
     while(!isAtEnd() && peek(0).type != TOKEN_RIGHT_BRACE) {
-        blockStmt->statements.push_back(statement());
+        blockStmt->statements.push_back(declaration());
     }
     consume(TOKEN_RIGHT_BRACE, " unclosed block, expected }");
     blockStmt->end = peek(-1).line;
