@@ -26,7 +26,7 @@ uint8_t Chunk::addConstant(Value value) {
     return constants.size() - 1;
 }
 
-void Chunk::emitConstantValue(const Token& token) {
+uint8_t Chunk::emitConstantValue(const Token& token) {
     Value constant;
     switch (token.type) {
         case TOKEN_NUMBER:
@@ -43,6 +43,7 @@ void Chunk::emitConstantValue(const Token& token) {
         throw CompileError(token, "more than 255 constants in one chunk");
     }
     emitBytes(static_cast<uint8_t>(OpCode::OP_CONSTANT), constant_id, token.line);
+    return constant_id;
 }
 
 void Chunk::emitOpCode(OpCode opCode, int line) {

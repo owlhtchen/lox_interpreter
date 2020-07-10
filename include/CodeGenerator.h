@@ -31,6 +31,7 @@ private:
     void visitUnaryExpr(const UnaryExpr& expr) override;
     void visitGroupingExpr(const GroupingExpr& expr) override;
     void visitBinaryExpr(const BinaryExpr& expr) override;
+    void visitAssignExpr(const AssignExpr& expr) override ;
     void visitExprStmt(const ExprStmt& stmt) override;
     void visitPrintStmt(const PrintStmt& stmt) override;
     void visitVarDeclStmt(const VarDeclStmt& stmt) override;

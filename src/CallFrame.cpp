@@ -137,7 +137,22 @@ void CallFrame::runFrame() {
             }
             case OpCode::OP_GET_LOCAL: {
                 uint8_t stackIndex = readByte();
-                pushStack(peekStack(stackIndex));
+                pushStack(peekStackBase(stackIndex));
+                break;
+            }
+            case OpCode::OP_SET_GLOBAL: {
+                StringObj* varName = std::get<Object*>(readConstant())->cast<StringObj>();
+                auto iter = vm.globals.find(varName);
+                if(iter != vm.globals.end()) {
+                    iter->second = peekStackTop();
+                } else {
+                    throw RuntimeError(getCurrentLine(), "variable " + varName->toString() + " is not declared");
+                }
+                break;
+            }
+            case OpCode::OP_SET_LOCAL: {
+                uint8_t index = readByte();
+                setStackBase(index, peekStackTop());
                 break;
             }
             default: {
@@ -174,12 +189,20 @@ Value CallFrame::popStack() {
     return temp;
 }
 
-Value CallFrame::peekStack(int relativeIndex) {
+Value CallFrame::peekStackBase(int relativeIndex) {
     return vm.stack[stackBase + relativeIndex];
 }
 
 void CallFrame::pushStack(Value value) {
     vm.stack.push_back(value);
+}
+
+Value CallFrame::peekStackTop() {
+    return vm.stack.back();
+}
+
+void CallFrame::setStackBase(int relativeIndex, const Value &newValue) {
+    vm.stack[stackBase + relativeIndex] = newValue;
 }
 
 

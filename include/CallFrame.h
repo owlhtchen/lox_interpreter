@@ -34,7 +34,9 @@ public:
     int getCurrentLine();
     void pushStack(Value value);
     Value popStack();
-    Value peekStack(int relativeIndex);
+    Value peekStackBase(int relativeIndex);
+    void setStackBase(int relativeIndex, const Value & newValue);
+    Value peekStackTop();
 };
 
 

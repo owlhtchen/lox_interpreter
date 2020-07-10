@@ -12,7 +12,21 @@ void Parser::parse() {
 }
 
 std::unique_ptr<Expr> Parser::expression() {
-    return equality();
+    return assignment();
+}
+
+std::unique_ptr<Expr> Parser::assignment() {
+    std::unique_ptr<Expr> expr = equality();
+    if(match(TOKEN_EQUAL)) {
+        auto* tmp = dynamic_cast<LiteralExpr*>(expr.get());
+        if(tmp != nullptr) {
+            return std::make_unique<AssignExpr>(tmp->token, expression());
+        } else {
+            throw RuntimeError(expr->getLastLine(), "invalid assignment target");
+        }
+    } else {
+        return expr;
+    }
 }
 
 std::unique_ptr<Expr> Parser::equality() {

@@ -29,7 +29,7 @@ public:
     void emitByte(uint8_t byte, int line);
     void emitBytes(uint8_t first, uint8_t second, int line);
     uint8_t addConstant(Value value);
-    void emitConstantValue(const Token& token);
+    uint8_t emitConstantValue(const Token& token);
     void emitOpCode(OpCode opCode, int line);
     void emitOpCodes(OpCode first, OpCode second, int line);
     void emitOpCodeByte(OpCode opCode, uint8_t operand, int line);

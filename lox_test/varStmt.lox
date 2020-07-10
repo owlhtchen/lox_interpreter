@@ -2,8 +2,10 @@ var a = "hello";
 print a;
 print "!";
 print a + "!";
+a = "new out hello";
 {
     var a = "inner hello";
+    a = "inner new";
     print a;
 }
 print "outer: " + a;

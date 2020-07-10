@@ -192,4 +192,19 @@ FunctionObj *CodeGenerator::endCurrentCompiler(int line) {
     return temp;
 }
 
+void CodeGenerator::visitAssignExpr(const AssignExpr &expr) {
+    int index = currentCompiler->resolveLocal(expr.variable);
+    auto chunk = getCurrentChunk();
+
+    compileExpr(*expr.assignValue); // assignValue is put on stackTop
+
+    if(index >= 0) {
+        chunk->emitOpCodeByte(OpCode::OP_SET_LOCAL, index, expr.getLastLine());
+    } else {
+        Value varName = StringPool::getInstance().getStringObj(expr.variable.lexeme);
+        index = chunk->addConstant(varName);
+        chunk->emitOpCodeByte(OpCode::OP_SET_GLOBAL, index, expr.getLastLine());
+    }
+}
+
 

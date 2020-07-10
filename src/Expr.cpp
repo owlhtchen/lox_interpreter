@@ -21,14 +21,38 @@ void LiteralExpr::accept(VisitorExpr& visitor) const {
     visitor.visitLiteralExpr(*this);
 }
 
+int LiteralExpr::getLastLine() const {
+    return token.line;
+}
+
 void UnaryExpr::accept(VisitorExpr& visitor) const {
     visitor.visitUnaryExpr(*this);
+}
+
+int UnaryExpr::getLastLine() const {
+    return right->getLastLine();
 }
 
 void GroupingExpr::accept(VisitorExpr& visitor) const {
     visitor.visitGroupingExpr(*this);
 }
 
+int GroupingExpr::getLastLine() const {
+    return innerExpr->getLastLine();
+}
+
 void BinaryExpr::accept(VisitorExpr& visitor) const {
     visitor.visitBinaryExpr(*this);
+}
+
+int BinaryExpr::getLastLine() const {
+    return right->getLastLine();
+}
+
+void AssignExpr::accept(VisitorExpr &visitor) const {
+    visitor.visitAssignExpr(*this);
+}
+
+int AssignExpr::getLastLine() const {
+    return variable.line;
 }

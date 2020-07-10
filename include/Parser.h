@@ -21,6 +21,7 @@ public:
         current(0), tokens(std::move(tokens)), hasError(false) {};
     void parse();
     std::unique_ptr<Expr> expression();
+    std::unique_ptr<Expr> assignment();
     std::unique_ptr<Expr> equality();
     std::unique_ptr<Expr> comparison();
     std::unique_ptr<Expr> addition();
