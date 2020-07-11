@@ -4,6 +4,7 @@
 #include <Error.h>
 #include <stdexcept>
 #include <utility>
+#include <iostream>
 
 void Parser::parse() {
     while (!isAtEnd()) {
@@ -87,13 +88,12 @@ std::unique_ptr<Expr> Parser::call() {
     std::vector<std::unique_ptr<Expr>> arguments;
     while(match(TOKEN_LEFT_PAREN)) {
         line = peek(-1).line;
-        do {
-            if(match(TOKEN_IDENTIFIER)) {
-                Token literal = peek(-1);
-                arguments.emplace_back(new LiteralExpr(literal));
-            }
-        } while(match(TOKEN_COMMA));
-        consume(TOKEN_RIGHT_PAREN, ") expected for function call");
+        if(peek(0).type != TOKEN_RIGHT_PAREN) {
+            do {
+                arguments.emplace_back(expression());
+            } while(match(TOKEN_COMMA));
+        }
+        consume(TOKEN_RIGHT_PAREN, ") expected for function call, but get " + peek(-1).lexeme);
         expr = std::make_unique<CallExpr>(std::move(expr), std::move(arguments), line);
     }
     return expr;
@@ -155,15 +155,18 @@ std::unique_ptr<Stmt> Parser::funcDecl() {
     std::vector<Token> params;
     std::vector<std::unique_ptr<Stmt>> body;
     consume(TOKEN_LEFT_PAREN, "( expected for function declaration");
-    while(!isAtEnd() && peek(0).type != TOKEN_RIGHT_PAREN) {
-        if(match(TOKEN_IDENTIFIER)) {
-            params.push_back(peek(-1));
-            if(peek(0).type != TOKEN_COMMA) {
-                break;
+    if(!isAtEnd() && peek(0).type != TOKEN_RIGHT_PAREN) {
+        do {
+            if(match(TOKEN_IDENTIFIER)) {
+                params.push_back(peek(-1));
+                if(peek(0).type != TOKEN_COMMA) {
+                    break;
+                }
+            } else {
+                throw SyntaxError(peek(0),
+                                  "expect identifier token for function parameter, but get " + peek(0).lexeme);
             }
-        } else {
-            throw SyntaxError(peek(0), "expect identifier token for function parameter");
-        }
+        } while(match(TOKEN_COMMA));
     }
     consume(TOKEN_RIGHT_PAREN, ") expected for function declaration");
     consume(TOKEN_LEFT_BRACE, "expect { for function body");

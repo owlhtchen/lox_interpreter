@@ -1,0 +1,18 @@
+fun world() {
+    print ", world!";
+}
+fun hello() {
+    print "hello";
+    world();
+}
+fun greet(name) {
+    print "hello, " + name;
+}
+fun bye(firstName, secondName) {
+    print "goodbye, " + firstName + " " + secondName;
+}
+hello();
+greet("chen");
+greet("lisa");
+bye("ht", "chen");
+bye("June", "2020");
