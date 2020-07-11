@@ -70,14 +70,35 @@ std::unique_ptr<Expr> Parser::multiplication() {
 }
 
 std::unique_ptr<Expr> Parser::unary() {
+    // unary → ( "!" | "-" ) unary | call ;
     if(match({TOKEN_BANG, TOKEN_MINUS})) {
         Token opr = peek(-1);
         std::unique_ptr<Expr> right = unary();
         return std::make_unique<UnaryExpr>(opr, std::move(right));
     } else {
-        return primary();
+        return call();
     }
 }
+
+std::unique_ptr<Expr> Parser::call() {
+    // call  → primary ( "(" arguments? ")" )* ; // including f("a")("b")("c")
+    std::unique_ptr<Expr> expr = primary();
+    int line;
+    std::vector<std::unique_ptr<Expr>> arguments;
+    while(match(TOKEN_LEFT_PAREN)) {
+        line = peek(-1).line;
+        do {
+            if(match(TOKEN_IDENTIFIER)) {
+                Token literal = peek(-1);
+                arguments.emplace_back(new LiteralExpr(literal));
+            }
+        } while(match(TOKEN_COMMA));
+        consume(TOKEN_RIGHT_PAREN, ") expected for function call");
+        expr = std::make_unique<CallExpr>(std::move(expr), std::move(arguments), line);
+    }
+    return expr;
+}
+
 
 std::unique_ptr<Expr> Parser::primary() {
     if(match({TOKEN_NUMBER, TOKEN_STRING, TOKEN_TRUE, TOKEN_FALSE, TOKEN_NIL, TOKEN_IDENTIFIER})) {
@@ -129,6 +150,30 @@ void Parser::consume(TokenType type, std::string err_msg ) {
     }
 }
 
+std::unique_ptr<Stmt> Parser::funcDecl() {
+    Token funcName = tokens[current++];
+    std::vector<Token> params;
+    std::vector<std::unique_ptr<Stmt>> body;
+    consume(TOKEN_LEFT_PAREN, "( expected for function declaration");
+    while(!isAtEnd() && peek(0).type != TOKEN_RIGHT_PAREN) {
+        if(match(TOKEN_IDENTIFIER)) {
+            params.push_back(peek(-1));
+            if(peek(0).type != TOKEN_COMMA) {
+                break;
+            }
+        } else {
+            throw SyntaxError(peek(0), "expect identifier token for function parameter");
+        }
+    }
+    consume(TOKEN_RIGHT_PAREN, ") expected for function declaration");
+    consume(TOKEN_LEFT_BRACE, "expect { for function body");
+    while(peek(0).type != TOKEN_RIGHT_BRACE) {
+        body.push_back(declaration());
+    }
+    consume(TOKEN_RIGHT_BRACE, "expect } for function body");
+    return std::make_unique<FunctionStmt>(funcName, std::move(params), std::move(body));
+}
+
 std::unique_ptr<Stmt> Parser::declaration() {
     if(match(TOKEN_VAR)) { // varDecl
         Token varToken = tokens[current++];
@@ -138,6 +183,8 @@ std::unique_ptr<Stmt> Parser::declaration() {
         }
         current++; // consume ; at the end
         return std::make_unique<VarDeclStmt>(varToken, std::move(expr));
+    } else if(match(TOKEN_FUN)) { // function declaration
+        return funcDecl();
     } else { // statement
         return statement();
     }

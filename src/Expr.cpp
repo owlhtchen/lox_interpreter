@@ -56,3 +56,11 @@ void AssignExpr::accept(VisitorExpr &visitor) const {
 int AssignExpr::getLastLine() const {
     return variable.line;
 }
+
+void CallExpr::accept(VisitorExpr &visitor) const {
+    visitor.visitCallExpr(*this);
+}
+
+int CallExpr::getLastLine() const {
+    return line;
+}

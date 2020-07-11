@@ -34,3 +34,11 @@ void BlockStmt::accept(VisitorStmt &visitor) const {
 int BlockStmt::getLastLine() const {
     return end;
 }
+
+void FunctionStmt::accept(VisitorStmt &visitor) const {
+    visitor.visitFunctionStmt(*this);
+}
+
+int FunctionStmt::getLastLine() const {
+    return body.empty() ? 0 : body.back()->getLastLine();
+}

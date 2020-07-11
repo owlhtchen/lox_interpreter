@@ -69,4 +69,16 @@ public:
     ~AssignExpr() override = default;
 };
 
+class CallExpr: public Expr {
+public:
+    std::unique_ptr<Expr> callee;
+    std::vector<std::unique_ptr<Expr>> arguments;
+    int line;
+    CallExpr(std::unique_ptr<Expr> callee, std::vector<std::unique_ptr<Expr>> arguments, int line):
+        callee(std::move(callee)), arguments(std::move(arguments)), line(line) { };
+    void accept(VisitorExpr& visitor) const override;
+    int getLastLine() const override ;
+    ~CallExpr() override = default;
+};
+
 #endif //LOX_INTERPRETER_EXPR_H

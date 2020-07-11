@@ -155,6 +155,13 @@ void CallFrame::runFrame() {
                 setStackBase(index, peekStackTop());
                 break;
             }
+            case OpCode::OP_CALL: {
+                uint8_t actualArity = readByte();
+                auto value = peekStackTop(actualArity);
+//                auto calleeObj = castToObj<FunctionObj>(&value);
+
+                break;
+            }
             default: {
                 throw std::logic_error("unhandle Opcode in CallFrame");
             }
@@ -197,8 +204,8 @@ void CallFrame::pushStack(Value value) {
     vm.stack.push_back(value);
 }
 
-Value CallFrame::peekStackTop() {
-    return vm.stack.back();
+Value CallFrame::peekStackTop(int relativeIndex) {
+    return vm.stack.end()[-1-relativeIndex];
 }
 
 void CallFrame::setStackBase(int relativeIndex, const Value &newValue) {

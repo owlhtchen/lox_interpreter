@@ -39,6 +39,8 @@ private:
     void defineVariable(uint8_t varNameIndex, int line);
     void defineGlobal(uint8_t varIdentifierId, int line);
     void visitBlockStmt(const BlockStmt& stmt) override;
+    void visitFunctionStmt(const FunctionStmt& functionStmt) override ;
+    void visitCallExpr(const CallExpr& callExpr) override ;
     FunctionObj* endCurrentCompiler(int line);
 };
 

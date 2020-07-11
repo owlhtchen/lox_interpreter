@@ -24,7 +24,7 @@ public:
     FunctionType functionType;
     void declareLocal(const Token& token);
     void addLocal(const Token& token);
-    void markDefined();
+    void markLocalDefined();
     void beginScope();
     void endScope(int endLine);
     int resolveLocal(const Token& varName);

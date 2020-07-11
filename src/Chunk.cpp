@@ -21,9 +21,13 @@ void Chunk::emitBytes(uint8_t first, uint8_t second, int line) {
     emitByte(second, line);
 }
 
-uint8_t Chunk::addConstant(Value value) {
+uint8_t Chunk::addConstant(Value value, int line) {
     constants.push_back(value);
-    return constants.size() - 1;
+    auto constantId = constants.size() - 1;
+    if(constantId > 255) {
+        throw CompileError(line, "more than 255 constants in one chunk");
+    }
+    return constantId;
 }
 
 uint8_t Chunk::emitConstantValue(const Token& token) {
@@ -38,12 +42,9 @@ uint8_t Chunk::emitConstantValue(const Token& token) {
         default:
             throw std::logic_error("unexpected token type [Chunk.cpp]");
     }
-    auto constant_id = addConstant(constant);
-    if(constant_id > 255) {
-        throw CompileError(token, "more than 255 constants in one chunk");
-    }
-    emitBytes(static_cast<uint8_t>(OpCode::OP_CONSTANT), constant_id, token.line);
-    return constant_id;
+    auto constantId = addConstant(constant, token.line);
+    emitBytes(static_cast<uint8_t>(OpCode::OP_CONSTANT), constantId, token.line);
+    return constantId;
 }
 
 void Chunk::emitOpCode(OpCode opCode, int line) {

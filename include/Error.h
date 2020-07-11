@@ -9,13 +9,13 @@
 class CompileError:public std::exception {
     // error when generating bytecode from ast
 private:
-    std::string message;
-    Token token;
     std:: string error_msg;
 public:
-    CompileError(Token token, std::string message):
-        token(std::move(token)), message(std::move(message)) {
-        error_msg = "Compiler Error at [" + std::to_string(token.line) + "]: " + this->message;
+    CompileError(const Token& token, const std::string& message) {
+        error_msg = "Compile Error at line [" + std::to_string(token.line) + "]: " + message;
+    };
+    CompileError(int line, const std::string& message) {
+      error_msg = "Compile Error at line [" + std::to_string(line) = "]: " + message;
     };
     [[nodiscard]] const char* what() const noexcept override;
 };

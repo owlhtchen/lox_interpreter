@@ -33,7 +33,10 @@ void FunctionCompiler::addLocal(const Token &token) {
     locals.emplace_back(token, -1);
 }
 
-void FunctionCompiler::markDefined() {
+void FunctionCompiler::markLocalDefined() {
+    if(currentScopeDepth == 0) {
+        return;
+    }
     locals.back().scopeDepth = currentScopeDepth;
 }
 

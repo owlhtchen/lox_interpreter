@@ -32,7 +32,7 @@ void CodeGenerator::visitLiteralExpr(const LiteralExpr &expr) {
                 chunk->emitOpCodeByte(OpCode::OP_GET_LOCAL, localIndex, line);
             } else {
                 StringObj* varName = StringPool::getInstance().getStringObj(expr.token.lexeme);
-                uint8_t globalIndex = chunk->addConstant(varName);
+                uint8_t globalIndex = chunk->addConstant(varName, line);
                 chunk->emitOpCodeByte(OpCode::OP_GET_GLOBAL, globalIndex, line);
             }
             break;
@@ -142,16 +142,16 @@ uint8_t CodeGenerator::declareVariable(const Token& token) {
         return 0;
     } else {
         StringObj* stringObj = StringPool::getInstance().getStringObj(token.lexeme);
-        return getCurrentChunk()->addConstant(stringObj);
+        return getCurrentChunk()->addConstant(stringObj, token.line);
     }
 }
 
 void CodeGenerator::defineVariable(uint8_t varNameIndex, int line) {
     // 1. global: emit OpCode and varIdentifier_index in constants (to set global map)
     // 2. local: just leave the init_expression value on the stack
-    // (set depth in currentCompiler->locals (markDefined))
+    // (set depth in currentCompiler->locals (markLocalDefined))
     if(currentCompiler->currentScopeDepth != 0) {
-        currentCompiler->markDefined();
+        currentCompiler->markLocalDefined();
     } else {
         defineGlobal(varNameIndex, line);
     }
@@ -202,9 +202,46 @@ void CodeGenerator::visitAssignExpr(const AssignExpr &expr) {
         chunk->emitOpCodeByte(OpCode::OP_SET_LOCAL, index, expr.getLastLine());
     } else {
         Value varName = StringPool::getInstance().getStringObj(expr.variable.lexeme);
-        index = chunk->addConstant(varName);
+        index = chunk->addConstant(varName, expr.getLastLine());
         chunk->emitOpCodeByte(OpCode::OP_SET_GLOBAL, index, expr.getLastLine());
     }
 }
 
+void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
+    int funcNameIndex = declareVariable(functionStmt.funcName);
+    int funcNameLine = functionStmt.funcName.line;
+    currentCompiler->markLocalDefined();
+
+    // functionObj will be loaded on stack top during runtime
+    currentCompiler = std::make_shared<FunctionCompiler>(currentCompiler, SCRIPT_TYPE, "");
+    currentCompiler->beginScope();
+    for(const auto& param: functionStmt.params) {
+        declareVariable(param);
+        currentCompiler->markLocalDefined();
+        currentCompiler->functionObj->arity++;
+    }
+    auto & stmts = functionStmt.body;
+    for(const auto& stmt: stmts) {
+        stmt->accept(*this);
+    }
+    int lastLine = stmts.empty()? 0 : stmts.back()->getLastLine();
+    FunctionObj* functionObj = endCurrentCompiler(lastLine);
+    auto chunk = getCurrentChunk();
+    auto index = chunk->addConstant(functionObj, funcNameLine);
+    chunk->emitOpCodeByte(OpCode::OP_CONSTANT, index, funcNameLine);
+
+    defineVariable(funcNameIndex, funcNameLine);
+}
+
+void CodeGenerator::visitCallExpr(const CallExpr &callExpr) {
+    compileExpr(*callExpr.callee); // push callee (as functionObj in Value) onto stack
+    int actualArity = 0;
+    for(const auto& argument: callExpr.arguments) {
+        // push arguments onto stack
+        compileExpr(*argument);
+        actualArity++;
+    }
+    auto chunk = getCurrentChunk();
+    chunk->emitOpCodeByte(OpCode::OP_CALL, actualArity, callExpr.line);
+}
 

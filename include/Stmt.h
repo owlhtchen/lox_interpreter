@@ -52,4 +52,15 @@ public:
     int getLastLine() const override;
 };
 
+class FunctionStmt: public Stmt {
+public:
+    Token funcName;
+    std::vector<Token> params;
+    std::vector<std::unique_ptr<Stmt>> body;
+    FunctionStmt(Token funcName, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body):
+        funcName(std::move(funcName)), params(std::move(params)), body(std::move(body)) { };
+    void accept(VisitorStmt& visitor) const override ;
+    int getLastLine() const override ;
+};
+
 #endif //LOX_INTERPRETER_STMT_H

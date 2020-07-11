@@ -21,3 +21,12 @@ std::string toString(Value value) {
         }
     }, value);
 }
+
+//template <typename T>
+//T* castToObj(Value* value) {
+//    auto tmp = std::get_if<Object*>(value);
+//    if(tmp == nullptr) {
+//        return nullptr;
+//    }
+//    return (*tmp)->dyn_cast<T>();
+//}

@@ -36,7 +36,7 @@ public:
     Value popStack();
     Value peekStackBase(int relativeIndex);
     void setStackBase(int relativeIndex, const Value & newValue);
-    Value peekStackTop();
+    Value peekStackTop(int relativeIndex = 0);
 };
 
 
