@@ -4,9 +4,9 @@
 #include <Error.h>
 #include <stdexcept>
 #include <FunctionCompiler.h>
-#include <Object.h>
+#include <DerivedObject.h>
 #include <Stmt.h>
-#include <Object.h>
+#include <DerivedObject.h>
 #include <iostream>
 
 void CodeGenerator::visitLiteralExpr(const LiteralExpr &expr) {

@@ -1,6 +1,6 @@
 
 #include <VM.h>
-#include <Object.h>
+#include <DerivedObject.h>
 
 
 int VM::createCallFrame(FunctionObj* callableObj, int stackBase) {

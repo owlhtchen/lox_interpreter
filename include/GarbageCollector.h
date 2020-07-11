@@ -3,7 +3,7 @@
 #define LOX_INTERPRETER_GARBAGECOLLECTOR_H
 // https://stackoverflow.com/questions/86582/singleton-how-should-it-be-used
 
-#include <Object.h>
+#include <DerivedObject.h>
 
 class GarbageCollector {
 private:

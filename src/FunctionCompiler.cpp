@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <utility>
 #include <Error.h>
-#include <Object.h>
+#include <DerivedObject.h>
 #include <GarbageCollector.h>
 #include <iostream>
 

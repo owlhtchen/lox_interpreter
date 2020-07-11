@@ -5,7 +5,7 @@
 #include <vector>
 #include <cstdint>
 #include <CallFrame.h>
-#include "Object.h"
+#include "DerivedObject.h"
 #include <unordered_map>
 
 class Object;

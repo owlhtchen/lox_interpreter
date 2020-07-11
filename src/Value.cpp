@@ -1,5 +1,5 @@
 #include <Value.h>
-#include <Object.h>
+#include <DerivedObject.h>
 #include <type_traits>
 
 template<typename> inline constexpr bool always_false_v = false;

@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <Token.h>
 #include <Error.h>
-#include <Object.h>
+#include <DerivedObject.h>
 
 void Chunk::emitByte(uint8_t byte, int line) {
     // e.g. OpCode with no argument

@@ -1,6 +1,6 @@
 
 #include "CallFrame.h"
-#include <Object.h>
+#include <DerivedObject.h>
 #include <VM.h>
 #include <util.h>
 #include <Value.h>
@@ -158,8 +158,10 @@ void CallFrame::runFrame() {
             case OpCode::OP_CALL: {
                 uint8_t actualArity = readByte();
                 auto value = peekStackTop(actualArity);
-//                auto calleeObj = castToObj<FunctionObj>(&value);
-
+                auto calleeObj = castToObj<FunctionObj>(&value);
+                // TODO: check arity
+                vm.setUpFunctionCall(calleeObj, actualArity);
+                return;
                 break;
             }
             default: {

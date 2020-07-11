@@ -1,6 +1,6 @@
 
 #include <GarbageCollector.h>
-#include <Object.h>
+#include <DerivedObject.h>
 
 GarbageCollector &GarbageCollector::getInstance() {
     // the only instance

@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <Value.h>
 #include <Token.h>
-#include "Object.h"
+#include "DerivedObject.h"
 
 
 class FunctionCompiler;
