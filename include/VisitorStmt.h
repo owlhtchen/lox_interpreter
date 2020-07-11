@@ -8,6 +8,7 @@ class PrintStmt;
 class VarDeclStmt;
 class BlockStmt;
 class FunctionStmt;
+class ReturnStmt;
 
 class VisitorStmt {
 public:
@@ -16,6 +17,7 @@ public:
     virtual void visitVarDeclStmt(const VarDeclStmt& expr) = 0;
     virtual void visitBlockStmt(const BlockStmt& expr) = 0;
     virtual void visitFunctionStmt(const FunctionStmt& stmt) = 0;
+    virtual void visitReturnStmt(const ReturnStmt& stmt) = 0;
 };
 
 #endif //LOX_INTERPRETER_STMTEXPR_H

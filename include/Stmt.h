@@ -63,4 +63,14 @@ public:
     int getLastLine() const override ;
 };
 
+class ReturnStmt: public Stmt {
+public:
+    Token returnKeyword;
+    std::unique_ptr<Expr> returnExpr;
+    ReturnStmt(Token returnKeyword, std::unique_ptr<Expr> returnExpr):
+        returnKeyword(std::move(returnKeyword)), returnExpr(std::move(returnExpr)) { };
+    void accept (VisitorStmt& visitor) const override ;
+    int getLastLine() const override ;
+};
+
 #endif //LOX_INTERPRETER_STMT_H

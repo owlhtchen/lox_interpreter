@@ -200,6 +200,13 @@ std::unique_ptr<Stmt> Parser::statement() {
         return std::make_unique<PrintStmt>(std::move(expr), tokens[current - 1].line);
     } else if (match(TOKEN_LEFT_BRACE)) {
         return block(peek(-1).line);
+    } else if(match(TOKEN_RETURN)) {
+        std::unique_ptr<Expr> returnExpr = nullptr;
+        if(peek(0).type != TOKEN_SEMICOLON) {
+            returnExpr = expression();
+        }
+        consume(TOKEN_SEMICOLON, "; expected after return statement");
+        return std::make_unique<ReturnStmt>(peek(-1), std::move(returnExpr));
     } else { // exprStmt;
         auto expr = expression();
         consume(TOKEN_SEMICOLON, "expected ;");

@@ -15,7 +15,7 @@ public:
         error_msg = "Compile Error at line [" + std::to_string(token.line) + "]: " + message;
     };
     CompileError(int line, const std::string& message) {
-      error_msg = "Compile Error at line [" + std::to_string(line) = "]: " + message;
+      error_msg = "Compile Error at line [" + std::to_string(line) + "]: " + message;
     };
     [[nodiscard]] const char* what() const noexcept override;
 };

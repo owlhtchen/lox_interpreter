@@ -121,6 +121,13 @@ void CallFrame::runFrame() {
                 break;
             }
             case OpCode::OP_RETURN: {
+                // returnValue should be on stackTop
+                Value returnValue = popStack();
+                while(vm.stack.size() > stackBase) { // pop all local variables for func call
+                    vm.stack.pop_back();
+                }
+                vm.stack.push_back(returnValue);
+
                 vm.callFrames.pop_back();
                 return;
                 break;
@@ -159,7 +166,13 @@ void CallFrame::runFrame() {
                 uint8_t actualArity = readByte();
                 auto value = peekStackTop(actualArity);
                 auto calleeObj = castToObj<FunctionObj>(&value);
-                // TODO: check arity
+                if(calleeObj->getArity() != actualArity) {
+                    std::string errMsg = "function " + calleeObj->getName() + " expects " +
+                            std::to_string(calleeObj->getArity()) + " argument(s), but got " +
+                            std::to_string(actualArity) + " argument(s)";
+                    throw RuntimeError(getCurrentLine(),
+                            errMsg);
+                }
                 vm.setUpFunctionCall(calleeObj, actualArity);
                 return;
                 break;

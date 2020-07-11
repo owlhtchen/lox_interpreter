@@ -42,3 +42,11 @@ void FunctionStmt::accept(VisitorStmt &visitor) const {
 int FunctionStmt::getLastLine() const {
     return body.empty() ? 0 : body.back()->getLastLine();
 }
+
+void ReturnStmt::accept(VisitorStmt &visitor) const {
+    visitor.visitReturnStmt(*this);
+}
+
+int ReturnStmt::getLastLine() const {
+    return returnKeyword.line;
+}

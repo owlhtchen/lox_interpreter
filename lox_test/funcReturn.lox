@@ -1,0 +1,20 @@
+fun avg(a, b) {
+    return (a + b) / 2;
+}
+fun hello() {
+    return "hello 111";
+}
+fun returnHelloFunc() {
+    // return global variable, which is a function
+    return hello;
+}
+fun nothing() {
+    var a = ".";
+}
+var a = "aaa";
+print avg(2, 3);
+print returnHelloFunc()();
+print nothing();
+print a;
+// nothing("a", "b");
+// return 100;

@@ -2,10 +2,28 @@ var a = "hello";
 print a;
 print "!";
 print a + "!";
-a = "new out hello";
+a = "out hello";
+var changed = "original";
+print " -- 2 --- ";
 {
+    changed = "changed once";
+    {
+        changed = "changed twice";
+        var a = "innermost hello";
+        print a;
+        print " -- 3 --- ";
+    }
     var a = "inner hello";
     a = "inner new";
+    var b = "b";
     print a;
+    var num = 92542;
+    print num;
+    print b;
+    print " -- 4 --- ";
 }
+var b = "bbb";
+print b;
 print "outer: " + a;
+print changed;
+print " -- 5 --- ";

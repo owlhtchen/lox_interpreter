@@ -41,7 +41,9 @@ private:
     void visitBlockStmt(const BlockStmt& stmt) override;
     void visitFunctionStmt(const FunctionStmt& functionStmt) override ;
     void visitCallExpr(const CallExpr& callExpr) override ;
+    void visitReturnStmt(const ReturnStmt& returnStmt) override ;
     FunctionObj* endCurrentCompiler(int line);
+
 };
 
 #endif //LOX_INTERPRETER_CODEGENERATOR_H

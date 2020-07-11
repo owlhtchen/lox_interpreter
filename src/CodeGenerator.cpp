@@ -8,6 +8,7 @@
 #include <Stmt.h>
 #include <DerivedObject.h>
 #include <iostream>
+#include <FunctionType.h>
 
 void CodeGenerator::visitLiteralExpr(const LiteralExpr &expr) {
     auto line = expr.token.line;
@@ -186,7 +187,11 @@ FunctionObj *CodeGenerator::compile(const std::vector<std::unique_ptr<Stmt>> &st
 }
 
 FunctionObj *CodeGenerator::endCurrentCompiler(int line) {
-    getCurrentChunk()->emitByte(static_cast<uint8_t>(OpCode::OP_RETURN), line);
+    // there might be a returnStmt in code and OP_RETURN is emitted, but emitting twice doesn't hurt
+    // since the CallFrame will be popped when the first OP_RETURN is seen
+    auto chunk = getCurrentChunk();
+    chunk->emitByte(static_cast<uint8_t>(OpCode::OP_NIL), line);
+    chunk->emitByte(static_cast<uint8_t>(OpCode::OP_RETURN), line);
     auto temp = currentCompiler->functionObj;
     currentCompiler = currentCompiler->enclosing;
     return temp;
@@ -213,7 +218,7 @@ void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
     currentCompiler->markLocalDefined();
 
     // functionObj will be loaded on stack top during runtime
-    currentCompiler = std::make_shared<FunctionCompiler>(currentCompiler, SCRIPT_TYPE, "");
+    currentCompiler = std::make_shared<FunctionCompiler>(currentCompiler, FUNCTION_TYPE, "");
     currentCompiler->beginScope();
     for(const auto& param: functionStmt.params) {
         declareVariable(param);
@@ -243,5 +248,20 @@ void CodeGenerator::visitCallExpr(const CallExpr &callExpr) {
     }
     auto chunk = getCurrentChunk();
     chunk->emitOpCodeByte(OpCode::OP_CALL, actualArity, callExpr.line);
+}
+
+void CodeGenerator::visitReturnStmt(const ReturnStmt &returnStmt) {
+    // TODO: check function type
+    if(currentCompiler->functionType == SCRIPT_TYPE) {
+        throw CompileError(returnStmt.getLastLine(), "'return' outside function");
+    }
+    auto chunk = getCurrentChunk();
+    int line = returnStmt.getLastLine();
+    if(returnStmt.returnExpr) {
+        compileExpr(*returnStmt.returnExpr);
+    } else {
+        chunk->emitByte(static_cast<uint8_t>(OpCode::OP_NIL), line);
+    }
+    chunk->emitByte(static_cast<uint8_t>(OpCode::OP_RETURN), line);
 }
 

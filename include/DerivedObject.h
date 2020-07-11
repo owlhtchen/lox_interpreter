@@ -58,6 +58,8 @@ public:
 //    FunctionObj(): name(""), arity(0) { };
     Chunk& getChunk() { return chunk; };
     std::string toString() override ;
+    int getArity() { return arity; }
+    std::string getName() { return name; }
 };
 
 #endif //LOX_INTERPRETER_DERIVEDOBJECT_H
