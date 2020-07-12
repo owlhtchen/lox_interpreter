@@ -79,3 +79,37 @@ int FunctionCompiler::resolveLocal(const Token& varName) {
     }
     return -1;
 }
+
+int FunctionCompiler::resolveUpValue(const Token &varName) {
+    int index = -1;
+    if(enclosing != nullptr) {
+        index = enclosing->resolveLocal(varName);
+    }
+    if(index != -1) { // varName is found in the immediate enclosing function => capture upValue at runtime
+        return addUpValue(index, true, varName.line);
+    }
+
+    if(enclosing != nullptr) {
+        index = enclosing->resolveUpValue(varName);
+    }
+    if(index != -1) { // index of varName captured as upValue in enclosing.upValues
+        return addUpValue(index, false, varName.line);
+    }
+    return -1;
+}
+
+int FunctionCompiler::addUpValue(int upValueIndex, bool isLocal, int line) {
+    // check whether this upValue already exists
+    for(int i = 0; i < upValues.size(); i++) {
+        const auto & upValue = upValues[i];
+        if(upValue.index == upValueIndex && upValue.isLocal == isLocal) {
+            return i;
+        }
+    }
+    upValues.emplace_back(upValueIndex, isLocal);
+    upValueIndex = upValues.size() - 1;
+    if(upValueIndex > 255) {
+        throw CompileError(line, "more than 255 UpValues (variables for closure) in one function");
+    }
+    return upValueIndex;
+}

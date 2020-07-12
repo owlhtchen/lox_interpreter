@@ -7,6 +7,7 @@
 #include <Local.h>
 #include <cstdint>
 #include <FunctionType.h>
+#include <UpValue.h>
 
 class FunctionObj;
 class Token;
@@ -22,12 +23,15 @@ public:
     std::vector<Local> locals;
     int currentScopeDepth;
     FunctionType functionType;
+    std::vector<UpValue> upValues;
     void declareLocal(const Token& token);
     void addLocal(const Token& token);
     void markLocalDefined();
     void beginScope();
     void endScope(int endLine);
     int resolveLocal(const Token& varName);
+    int resolveUpValue(const Token& varName);
+    int addUpValue(int upValueIndex, bool isLocal, int line);
 };
 
 

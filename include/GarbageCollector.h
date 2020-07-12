@@ -8,6 +8,7 @@
 class GarbageCollector {
 private:
     Object* allObjects;
+    UpValueObj* allOpenUpValues;
     // private constructor
     GarbageCollector(): allObjects(nullptr) {};
 public:

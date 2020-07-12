@@ -1,6 +1,7 @@
 #include <DerivedObject.h>
 #include <GarbageCollector.h>
 #include <variant>
+#include <Value.h>
 
 
 StringPool &StringPool::getInstance() {
@@ -26,4 +27,16 @@ std::string StringObj::toString() {
 
 std::string FunctionObj::toString() {
     return "function " + name;
+}
+
+std::string ClosureObj::toString() {
+    return "closure: " + functionObj->getName();
+}
+
+ClosureObj::ClosureObj(FunctionObj *functionObj):
+    functionObj(functionObj), closureCount(functionObj->closureCount) {
+}
+
+std::string UpValueObj::toString() {
+    return "UpValue: " + ::toString(*location);
 }

@@ -9,7 +9,6 @@
 #include <unordered_map>
 
 class Object;
-class CallableObj;
 class FunctionObj;
 
 class VM {
@@ -23,8 +22,8 @@ private:
 public:
     // should take in a functionObj
     explicit VM() = default;
-    int createCallFrame(FunctionObj* callableObj, int stackBase);
-    void setUpFunctionCall(FunctionObj* callableObj, int argCount);
+    int createCallFrame(ClosureObj* callableObj, int stackBase);
+    void setUpFunctionCall(ClosureObj* callableObj, int argCount);
     void start(FunctionObj* functionObj);
     void run();
 };

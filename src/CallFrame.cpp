@@ -165,27 +165,48 @@ void CallFrame::runFrame() {
             case OpCode::OP_CALL: {
                 uint8_t actualArity = readByte();
                 auto value = peekStackTop(actualArity);
-                auto calleeObj = castToObj<FunctionObj>(&value);
-                if(calleeObj->getArity() != actualArity) {
-                    std::string errMsg = "function " + calleeObj->getName() + " expects " +
-                            std::to_string(calleeObj->getArity()) + " argument(s), but got " +
+                auto closure = castToObj<ClosureObj>(&value);
+                auto function = closure->functionObj;
+                if(function->getArity() != actualArity) {
+                    std::string errMsg = "function " + function->getName() + " expects " +
+                            std::to_string(function->getArity()) + " argument(s), but got " +
                             std::to_string(actualArity) + " argument(s)";
                     throw RuntimeError(getCurrentLine(),
                             errMsg);
                 }
-                vm.setUpFunctionCall(calleeObj, actualArity);
+                vm.setUpFunctionCall(closure, actualArity);
                 return;
                 break;
             }
+            case OpCode::OP_CLOSURE: {
+                auto functionValue = readConstant();
+                auto newFunction = castToObj<FunctionObj>(&functionValue);
+                auto newClosure = new ClosureObj(newFunction);
+                for(int i = 0; i < newClosure->closureCount; i++) {
+                    int upValueIndex = readByte();
+                    int isLocal = readByte();
+                    if(isLocal) {
+
+                    } else {
+                        newClosure->upValues.push_back(closureObj->upValues[upValueIndex]);
+                    }
+                }
+                pushStack(newClosure);
+                break;
+            }
             default: {
-                throw std::logic_error("unhandle Opcode in CallFrame");
+                throw std::logic_error("unhandled Opcode in CallFrame");
             }
         }
     }
 }
 
+UpValueObj* CallFrame::captureUpValue(Value* position) {
+    return new UpValueObj(position);
+}
+
 Chunk& CallFrame::getCurrentChunk() {
-    return functionObj->getChunk();
+    return closureObj->functionObj->getChunk();
 }
 
 uint8_t CallFrame::readByte() {

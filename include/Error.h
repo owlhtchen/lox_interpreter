@@ -44,6 +44,7 @@ private:
 public:
     RuntimeError(int line, std::string message):
             line(line), message(std::move(message)) {
+        // TODO: print stack trace
         error_msg = "Runtime Error at line [" + std::to_string(line) + "]: " + this->message;
     };
     [[nodiscard]] const char* what() const noexcept override;

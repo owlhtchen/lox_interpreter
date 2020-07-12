@@ -8,20 +8,21 @@
 #include <vector>
 #include "VM.h"
 
-class FunctionObj;
+class ClosureObj;
+class UpValueObj;
 class VM;
 
 class CallFrame {
     friend class VM;
 private:
-    FunctionObj* functionObj;
+    ClosureObj* closureObj;
     int ip;
     int stackBase;
     //vm: a reference to the vm which contains this CallFrame
     VM & vm;
     // CallFrame should only be constructed with the containing VM
-    CallFrame(FunctionObj* functionObj, int stackBase, VM& vm):
-            functionObj(functionObj), stackBase(stackBase), ip(0), vm(vm) { };
+    CallFrame(ClosureObj* closureObj, int stackBase, VM& vm):
+            closureObj(closureObj), stackBase(stackBase), ip(0), vm(vm) { };
 public:
     // runFrame: when it gets OpCall, it sets up the frame and return to the containing VM
     // VM will then run the topmost frame on callFrames,
@@ -37,6 +38,7 @@ public:
     Value peekStackBase(int relativeIndex);
     void setStackBase(int relativeIndex, const Value & newValue);
     Value peekStackTop(int relativeIndex = 0);
+    UpValueObj* captureUpValue(Value* position);
 };
 
 

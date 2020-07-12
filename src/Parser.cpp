@@ -94,6 +94,9 @@ std::unique_ptr<Expr> Parser::call() {
             } while(match(TOKEN_COMMA));
         }
         consume(TOKEN_RIGHT_PAREN, ") expected for function call, but get " + peek(-1).lexeme);
+        if(arguments.size() >= 255) {
+            throw CompileError(line, "more than 255 arguments in function call");
+        }
         expr = std::make_unique<CallExpr>(std::move(expr), std::move(arguments), line);
     }
     return expr;

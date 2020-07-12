@@ -192,6 +192,7 @@ FunctionObj *CodeGenerator::endCurrentCompiler(int line) {
     auto chunk = getCurrentChunk();
     chunk->emitByte(static_cast<uint8_t>(OpCode::OP_NIL), line);
     chunk->emitByte(static_cast<uint8_t>(OpCode::OP_RETURN), line);
+    currentCompiler->functionObj->closureCount = currentCompiler->upValues.size();
     auto temp = currentCompiler->functionObj;
     currentCompiler = currentCompiler->enclosing;
     return temp;
@@ -233,7 +234,12 @@ void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
     FunctionObj* functionObj = endCurrentCompiler(lastLine);
     auto chunk = getCurrentChunk();
     auto index = chunk->addConstant(functionObj, funcNameLine);
-    chunk->emitOpCodeByte(OpCode::OP_CONSTANT, index, funcNameLine);
+//    chunk->emitOpCodeByte(OpCode::OP_CONSTANT, index, funcNameLine);
+    chunk->emitOpCodeByte(OpCode::OP_CLOSURE, index, funcNameLine);
+    for(const auto & upValue: currentCompiler->upValues) {
+        chunk->emitByte(upValue.index, funcNameLine);
+        chunk->emitByte(upValue.isLocal ? 1 : 0, funcNameLine);
+    }
 
     defineVariable(funcNameIndex, funcNameLine);
 }

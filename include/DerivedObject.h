@@ -39,12 +39,6 @@ public:
 
 class FunctionObj;
 
-//class CallableObj {
-//public:
-//    virtual Value getThis() = 0;
-//    virtual FunctionObj* getClosure() = 0;
-//};
-
 class FunctionObj: public Object {
     friend class GarbageCollector;
     friend class CodeGenerator;
@@ -54,12 +48,32 @@ private:
     int arity;
     Chunk chunk;
 public:
+    int closureCount;
     explicit FunctionObj(std::string name = ""): name(std::move(name)), arity(0){ };
 //    FunctionObj(): name(""), arity(0) { };
     Chunk& getChunk() { return chunk; };
     std::string toString() override ;
     int getArity() { return arity; }
     std::string getName() { return name; }
+};
+
+class UpValueObj: public Object {
+public:
+    Value* location;
+    Value closed;
+    UpValueObj* next;
+    UpValueObj(Value * location):
+        location(location), closed(std::monostate()), next(nullptr) { };
+    std::string toString() override ;
+};
+
+class ClosureObj: public Object {
+public:
+    int closureCount;
+    FunctionObj* functionObj;
+    std::vector<UpValueObj*> upValues;
+    explicit ClosureObj(FunctionObj* functionObj);
+    std::string toString() override ;
 };
 
 #endif //LOX_INTERPRETER_DERIVEDOBJECT_H
