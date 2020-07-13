@@ -199,7 +199,9 @@ FunctionObj *CodeGenerator::endCurrentCompiler(int line) {
     chunk->emitByte(static_cast<uint8_t>(OpCode::OP_NIL), line);
     chunk->emitByte(static_cast<uint8_t>(OpCode::OP_RETURN), line);
     currentCompiler->functionObj->closureCount = currentCompiler->upValues.size();
-    return currentCompiler->functionObj;
+    auto tmp = currentCompiler->functionObj;
+    currentCompiler = currentCompiler->enclosing;
+    return tmp;
 }
 
 void CodeGenerator::visitAssignExpr(const AssignExpr &expr) {
@@ -243,20 +245,17 @@ void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
         stmt->accept(*this);
     }
     int lastLine = stmts.empty()? 0 : stmts.back()->getLastLine();
+    std::shared_ptr<FunctionCompiler> newFunctionCompiler = currentCompiler;
     FunctionObj* functionObj = endCurrentCompiler(lastLine);
-//    FunctionObj* functionObj = currentCompiler->functionObj;
-    auto chunkNewFunc = &currentCompiler->enclosing->functionObj->chunk;
-    auto index = chunkNewFunc->addConstant(functionObj, funcNameLine);
+    auto chunk = getCurrentChunk();
+    auto index = chunk->addConstant(functionObj, funcNameLine);
 //    chunk->emitOpCodeByte(OpCode::OP_CONSTANT, index, funcNameLine);
-    chunkNewFunc->emitOpCodeByte(OpCode::OP_CLOSURE, index, funcNameLine);
-    // these should be before endCurrentCompiler!!
-    for(const auto & upValue: currentCompiler->upValues) {
-        chunkNewFunc->emitByte(upValue.index, funcNameLine);
-        chunkNewFunc->emitByte(upValue.isLocal ? 1 : 0, funcNameLine);
+    chunk->emitOpCodeByte(OpCode::OP_CLOSURE, index, funcNameLine);
+    // newFunctionCompiler.enclosing == currentCompiler
+    for(const auto & upValue: newFunctionCompiler->upValues) {
+        chunk->emitByte(upValue.index, funcNameLine);
+        chunk->emitByte(upValue.isLocal ? 1 : 0, funcNameLine);
     }
-//     endCurrentCompiler(lastLine);
-//    auto temp = currentCompiler->functionObj;
-    currentCompiler = currentCompiler->enclosing;
 
     defineVariable(funcNameIndex, funcNameLine);
 }
