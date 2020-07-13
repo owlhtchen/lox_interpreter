@@ -228,7 +228,6 @@ void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
     int funcNameIndex = declareVariable(functionStmt.funcName);
     int funcNameLine = functionStmt.funcName.line;
     std::string funcName = functionStmt.funcName.lexeme;
-    std::cout << "visiting " << funcName << std::endl;
     currentCompiler->markLocalDefined();
 
     // functionObj will be loaded on stack top during runtime
@@ -246,22 +245,18 @@ void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
     int lastLine = stmts.empty()? 0 : stmts.back()->getLastLine();
     FunctionObj* functionObj = endCurrentCompiler(lastLine);
 //    FunctionObj* functionObj = currentCompiler->functionObj;
-    auto chunk = &currentCompiler->enclosing->functionObj->chunk;
-    auto index = chunk->addConstant(functionObj, funcNameLine);
+    auto chunkNewFunc = &currentCompiler->enclosing->functionObj->chunk;
+    auto index = chunkNewFunc->addConstant(functionObj, funcNameLine);
 //    chunk->emitOpCodeByte(OpCode::OP_CONSTANT, index, funcNameLine);
-    chunk->emitOpCodeByte(OpCode::OP_CLOSURE, index, funcNameLine);
+    chunkNewFunc->emitOpCodeByte(OpCode::OP_CLOSURE, index, funcNameLine);
     // these should be before endCurrentCompiler!!
-    std::cout << " current upvalue.size(): " << currentCompiler->upValues.size() << " for " << currentCompiler->functionObj->getName() << std::endl;
     for(const auto & upValue: currentCompiler->upValues) {
-        std::cout << "emitted index: " << std::to_string(upValue.index)
-        << " , local: " << std::to_string(upValue.isLocal) << std::endl;
-        chunk->emitByte(upValue.index, funcNameLine);
-        chunk->emitByte(upValue.isLocal ? 1 : 0, funcNameLine);
+        chunkNewFunc->emitByte(upValue.index, funcNameLine);
+        chunkNewFunc->emitByte(upValue.isLocal ? 1 : 0, funcNameLine);
     }
 //     endCurrentCompiler(lastLine);
-    auto temp = currentCompiler->functionObj;
+//    auto temp = currentCompiler->functionObj;
     currentCompiler = currentCompiler->enclosing;
-    std::cout << "end visiting " << funcName << std::endl;
 
     defineVariable(funcNameIndex, funcNameLine);
 }

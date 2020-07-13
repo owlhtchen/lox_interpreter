@@ -11,7 +11,6 @@ void CallFrame::runFrame() {
     OpCode currentOpcode;
     Value second, first;
     auto& chunk = getCurrentChunk();
-    std::cout << "call frame of " << closureObj->functionObj->getName() << std::endl;
 
     while(ip < chunk.code.size()) {
         currentOpcode = readOpCode();
@@ -182,15 +181,12 @@ void CallFrame::runFrame() {
             case OpCode::OP_CLOSURE: {
                 auto functionValue = readConstant();
                 auto newFunction = castToObj<FunctionObj>(&functionValue);
-                std::cout << "created: " << newFunction->toString() << std::endl;
                 auto newClosure = new ClosureObj(newFunction);
-                std::cout << "created: " << newClosure->toString() << std::endl;
                 for(int i = 0; i < newClosure->closureCount; i++) {
                     int upValueIndex = readByte();
                     int isLocal = readByte();
                     if(isLocal) {
                         auto tmp = captureUpValue(upValueIndex);
-                        std::cout << "captured upValue " << toString(*tmp->location) << std::endl;
                         newClosure->upValues.push_back(tmp);
                     } else {
                         newClosure->upValues.push_back(closureObj->upValues[upValueIndex]);
@@ -220,7 +216,6 @@ void CallFrame::runFrame() {
 
 UpValueObj* CallFrame::captureUpValue(int localVarIndex) {
     Value * ptr = &vm.stack[stackBase + localVarIndex];
-    std::cout << "capturing " << toString(*ptr) << " at " << std::to_string(localVarIndex) << std::endl;
     return new UpValueObj(ptr);
 }
 
