@@ -38,7 +38,7 @@ public:
     Value peekStackBase(int relativeIndex);
     void setStackBase(int relativeIndex, const Value & newValue);
     Value peekStackTop(int relativeIndex = 0);
-    UpValueObj* captureUpValue(Value* position);
+    UpValueObj* captureUpValue(int localVarIndex);
 };
 
 

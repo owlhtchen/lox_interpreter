@@ -21,7 +21,7 @@ private:
     std::unordered_map<StringObj*, Value> globals;
 public:
     // should take in a functionObj
-    explicit VM() = default;
+    explicit VM();
     int createCallFrame(ClosureObj* callableObj, int stackBase);
     void setUpFunctionCall(ClosureObj* callableObj, int argCount);
     void start(FunctionObj* functionObj);

@@ -29,13 +29,19 @@ void CodeGenerator::visitLiteralExpr(const LiteralExpr &expr) {
             break;
         case TOKEN_IDENTIFIER: {
             int localIndex = currentCompiler->resolveLocal(expr.token);
-            if(localIndex >= 0) {
+            if(localIndex >= 0) { // local variable
                 chunk->emitOpCodeByte(OpCode::OP_GET_LOCAL, localIndex, line);
-            } else {
-                StringObj* varName = StringPool::getInstance().getStringObj(expr.token.lexeme);
-                uint8_t globalIndex = chunk->addConstant(varName, line);
-                chunk->emitOpCodeByte(OpCode::OP_GET_GLOBAL, globalIndex, line);
+                break;
             }
+            int upValueIndex = currentCompiler->resolveUpValue(expr.token);
+            if(upValueIndex >= 0) { // variable is captured in closure
+                chunk->emitOpCodeByte(OpCode::OP_GET_UPVALUE, upValueIndex, line);
+                break;
+            }
+            // global variable
+            StringObj* varName = StringPool::getInstance().getStringObj(expr.token.lexeme);
+            uint8_t globalIndex = chunk->addConstant(varName, line);
+            chunk->emitOpCodeByte(OpCode::OP_GET_GLOBAL, globalIndex, line);
             break;
         }
         default:
@@ -200,26 +206,35 @@ FunctionObj *CodeGenerator::endCurrentCompiler(int line) {
 
 void CodeGenerator::visitAssignExpr(const AssignExpr &expr) {
     int index = currentCompiler->resolveLocal(expr.variable);
+    int line = expr.getLastLine();
     auto chunk = getCurrentChunk();
 
     compileExpr(*expr.assignValue); // assignValue is put on stackTop
 
-    if(index >= 0) {
-        chunk->emitOpCodeByte(OpCode::OP_SET_LOCAL, index, expr.getLastLine());
-    } else {
-        Value varName = StringPool::getInstance().getStringObj(expr.variable.lexeme);
-        index = chunk->addConstant(varName, expr.getLastLine());
-        chunk->emitOpCodeByte(OpCode::OP_SET_GLOBAL, index, expr.getLastLine());
+    if(index >= 0) { // local variable
+        chunk->emitOpCodeByte(OpCode::OP_SET_LOCAL, index, line);
+        return;
     }
+    index = currentCompiler->resolveUpValue(expr.variable);
+    if(index >= 0) { // upValue captured in closure
+        chunk->emitOpCodeByte(OpCode::OP_SET_UPVALUE, index, line);
+        return;
+    }
+    // global variable
+    Value varName = StringPool::getInstance().getStringObj(expr.variable.lexeme);
+    index = chunk->addConstant(varName, expr.getLastLine());
+    chunk->emitOpCodeByte(OpCode::OP_SET_GLOBAL, index, line);
 }
 
 void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
     int funcNameIndex = declareVariable(functionStmt.funcName);
     int funcNameLine = functionStmt.funcName.line;
+    std::string funcName = functionStmt.funcName.lexeme;
+    std::cout << "visiting " << funcName << std::endl;
     currentCompiler->markLocalDefined();
 
     // functionObj will be loaded on stack top during runtime
-    currentCompiler = std::make_shared<FunctionCompiler>(currentCompiler, FUNCTION_TYPE, "");
+    currentCompiler = std::make_shared<FunctionCompiler>(currentCompiler, FUNCTION_TYPE, funcName);
     currentCompiler->beginScope();
     for(const auto& param: functionStmt.params) {
         declareVariable(param);
@@ -232,14 +247,21 @@ void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
     }
     int lastLine = stmts.empty()? 0 : stmts.back()->getLastLine();
     FunctionObj* functionObj = endCurrentCompiler(lastLine);
+//    FunctionObj* functionObj = currentCompiler->functionObj;
     auto chunk = getCurrentChunk();
     auto index = chunk->addConstant(functionObj, funcNameLine);
 //    chunk->emitOpCodeByte(OpCode::OP_CONSTANT, index, funcNameLine);
     chunk->emitOpCodeByte(OpCode::OP_CLOSURE, index, funcNameLine);
+    // these should be before endCurrentCompiler!!
+    std::cout << " current upvalue.size(): " << currentCompiler->upValues.size() << " for " << currentCompiler->functionObj->getName() << std::endl;
     for(const auto & upValue: currentCompiler->upValues) {
+        std::cout << "emitted index: " << std::to_string(upValue.index)
+        << " , local: " << std::to_string(upValue.isLocal) << std::endl;
         chunk->emitByte(upValue.index, funcNameLine);
         chunk->emitByte(upValue.isLocal ? 1 : 0, funcNameLine);
     }
+//     endCurrentCompiler(lastLine);
+    std::cout << "end visiting " << funcName << std::endl;
 
     defineVariable(funcNameIndex, funcNameLine);
 }

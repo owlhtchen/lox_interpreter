@@ -81,11 +81,13 @@ int FunctionCompiler::resolveLocal(const Token& varName) {
 }
 
 int FunctionCompiler::resolveUpValue(const Token &varName) {
+    std::cout << "resolve upvalue " << varName.lexeme << "@ " << std::to_string(varName.line) << std::endl;
     int index = -1;
     if(enclosing != nullptr) {
         index = enclosing->resolveLocal(varName);
     }
     if(index != -1) { // varName is found in the immediate enclosing function => capture upValue at runtime
+        std::cout << " !resolved immediate: " << varName.lexeme << " " << std::to_string(index) << std::endl;
         return addUpValue(index, true, varName.line);
     }
 
@@ -93,6 +95,7 @@ int FunctionCompiler::resolveUpValue(const Token &varName) {
         index = enclosing->resolveUpValue(varName);
     }
     if(index != -1) { // index of varName captured as upValue in enclosing.upValues
+        std::cout << " !resolved recurse: " << varName.lexeme << " " << std::to_string(index) << std::endl;
         return addUpValue(index, false, varName.line);
     }
     return -1;
@@ -111,5 +114,7 @@ int FunctionCompiler::addUpValue(int upValueIndex, bool isLocal, int line) {
     if(upValueIndex > 255) {
         throw CompileError(line, "more than 255 UpValues (variables for closure) in one function");
     }
+    std::cout << " added upvalue to " << functionObj->getName() << " :(index) "
+    << std::to_string(upValueIndex) << std::endl;
     return upValueIndex;
 }
