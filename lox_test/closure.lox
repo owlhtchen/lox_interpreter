@@ -1,20 +1,20 @@
-// var x = "global";
-// fun outer() {
-//   var x = "outer";
-//   fun inner() {
-//     print "executing inner";
-//     print x;
-//   }
-//   inner();
-// }
-// outer();
+var x = "global";
+fun outer() {
+  var x = "outer";
+  fun inner() {
+    print "executing inner";
+    print x;
+  }
+  inner();
+}
+outer();
 
 // 2
-fun hello() {
-//    fun world () {
-//        print "world";
-//    }
-    print "hello";
-//    world();
-}
-hello();
+// fun hello() {
+//     fun world () {
+//         print "world";
+//     }
+//     print "hello";
+//     world();
+// }
+// hello();

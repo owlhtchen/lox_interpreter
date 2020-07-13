@@ -199,9 +199,7 @@ FunctionObj *CodeGenerator::endCurrentCompiler(int line) {
     chunk->emitByte(static_cast<uint8_t>(OpCode::OP_NIL), line);
     chunk->emitByte(static_cast<uint8_t>(OpCode::OP_RETURN), line);
     currentCompiler->functionObj->closureCount = currentCompiler->upValues.size();
-    auto temp = currentCompiler->functionObj;
-    currentCompiler = currentCompiler->enclosing;
-    return temp;
+    return currentCompiler->functionObj;
 }
 
 void CodeGenerator::visitAssignExpr(const AssignExpr &expr) {
@@ -248,7 +246,7 @@ void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
     int lastLine = stmts.empty()? 0 : stmts.back()->getLastLine();
     FunctionObj* functionObj = endCurrentCompiler(lastLine);
 //    FunctionObj* functionObj = currentCompiler->functionObj;
-    auto chunk = getCurrentChunk();
+    auto chunk = &currentCompiler->enclosing->functionObj->chunk;
     auto index = chunk->addConstant(functionObj, funcNameLine);
 //    chunk->emitOpCodeByte(OpCode::OP_CONSTANT, index, funcNameLine);
     chunk->emitOpCodeByte(OpCode::OP_CLOSURE, index, funcNameLine);
@@ -261,6 +259,8 @@ void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
         chunk->emitByte(upValue.isLocal ? 1 : 0, funcNameLine);
     }
 //     endCurrentCompiler(lastLine);
+    auto temp = currentCompiler->functionObj;
+    currentCompiler = currentCompiler->enclosing;
     std::cout << "end visiting " << funcName << std::endl;
 
     defineVariable(funcNameIndex, funcNameLine);
