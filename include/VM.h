@@ -7,6 +7,7 @@
 #include <CallFrame.h>
 #include "DerivedObject.h"
 #include <unordered_map>
+#include <Stack.h>
 
 class Object;
 class FunctionObj;
@@ -17,11 +18,12 @@ private:
 //    Chunk chunk;
 //    int ip;
     std::vector<CallFrame> callFrames;
-    std::vector<Value> stack;
+    // stack should not be resized because upValue.position needs to refer to a fixed address.
+    Stack<Value, 16384> stack;
     std::unordered_map<StringObj*, Value> globals;
 public:
     // should take in a functionObj
-    explicit VM();
+    VM();
     int createCallFrame(ClosureObj* callableObj, int stackBase);
     void setUpFunctionCall(ClosureObj* callableObj, int argCount);
     void start(FunctionObj* functionObj);

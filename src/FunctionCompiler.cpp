@@ -49,8 +49,13 @@ void FunctionCompiler::endScope(int endLine) {
     auto& chunk = functionObj->getChunk();
     while (locals.size() >= 0 &&
     locals.back().scopeDepth > currentScopeDepth) {
+        auto local = locals.back();
+        if(local.isCaptured) {
+            chunk.emitOpCode(OpCode::OP_CLOSE_UPVALUE, endLine);
+        } else {
+            chunk.emitOpCode(OpCode::OP_POP, endLine);
+        }
         locals.pop_back();
-        chunk.emitOpCode(OpCode::OP_POP, endLine);
     }
 }
 
@@ -86,6 +91,7 @@ int FunctionCompiler::resolveUpValue(const Token &varName) {
         index = enclosing->resolveLocal(varName);
     }
     if(index != -1) { // varName is found in the immediate enclosing function => capture upValue at runtime
+        enclosing->locals[index].isCaptured = true;
         return addUpValue(index, true, varName.line);
     }
 

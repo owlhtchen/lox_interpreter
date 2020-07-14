@@ -10,9 +10,10 @@ class Local {
 private:
     Token token;
     int scopeDepth;
+    bool isCaptured;
 public:
     Local(Token token, int scopeDepth):
-        token(std::move(token)), scopeDepth(scopeDepth) { };
+        token(std::move(token)), scopeDepth(scopeDepth), isCaptured(false) { };
 };
 
 

@@ -258,6 +258,8 @@ void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
     }
 
     defineVariable(funcNameIndex, funcNameLine);
+
+    currentCompiler->endScope(functionStmt.getLastLine());
 }
 
 void CodeGenerator::visitCallExpr(const CallExpr &callExpr) {

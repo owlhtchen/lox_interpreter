@@ -1,0 +1,32 @@
+var x = "global";
+fun outer() {
+  var x = "outer";
+  fun inner() {
+    // var x = "inner";
+    print "from inner:";
+    print x;
+    x = "changed by inner";
+  }
+  fun another() {
+    print "from another: ";
+    print x;
+    x = "changed by another";
+  }
+  inner();
+  print "after inner: ";
+  print x;
+  another();
+  print "call inner again: ";
+  inner();
+}
+outer();
+
+// 2
+// fun hello() {
+//     fun world () {
+//         print "world";
+//     }
+//     print "hello";
+//     world();
+// }
+// hello();

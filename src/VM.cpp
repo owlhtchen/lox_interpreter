@@ -3,9 +3,7 @@
 #include <DerivedObject.h>
 #include <iostream>
 
-VM::VM() {
-    stack.reserve(1000);
-}
+VM::VM() = default;
 
 int VM::createCallFrame(ClosureObj* callableObj, int stackBase) {
     callFrames.push_back(CallFrame(callableObj, stackBase, *this));
@@ -28,7 +26,7 @@ void VM::run() {
 void VM::start(FunctionObj *functionObj) {
     std::cout << "vm started" << std::endl;
     auto closureObj = new ClosureObj(functionObj);
-    stack.emplace_back(closureObj);
+    stack.push_back(closureObj);
     setUpFunctionCall(closureObj, 0);
     run();
 }

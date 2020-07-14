@@ -115,6 +115,10 @@ void CallFrame::runFrame() {
                 popStack();
                 break;
             }
+            case OpCode::OP_CLOSE_UPVALUE: {
+                // TODO: find the address of vm.stack value in GarbageCollector
+                break;
+            }
             case OpCode::OP_PRINT: {
                 auto value = popStack();
                 std::cout << toString(value) << std::endl;
@@ -215,6 +219,7 @@ void CallFrame::runFrame() {
 }
 
 UpValueObj* CallFrame::captureUpValue(int localVarIndex) {
+    std::cerr << "captureUpValue" << std::endl;
     Value * ptr = &vm.stack[stackBase + localVarIndex];
     return new UpValueObj(ptr);
 }
@@ -247,6 +252,7 @@ Value CallFrame::popStack() {
 }
 
 Value CallFrame::peekStackBase(int relativeIndex) {
+    std::cout << "- peekStackBase" << std::endl;
     return vm.stack[stackBase + relativeIndex];
 }
 
@@ -255,10 +261,11 @@ void CallFrame::pushStack(Value value) {
 }
 
 Value CallFrame::peekStackTop(int relativeIndex) {
-    return vm.stack.end()[-1-relativeIndex];
+    return vm.stack.indexFromEnd(relativeIndex);
 }
 
 void CallFrame::setStackBase(int relativeIndex, const Value &newValue) {
+    std::cout << "- setStackBase" << std::endl;
     vm.stack[stackBase + relativeIndex] = newValue;
 }
 
