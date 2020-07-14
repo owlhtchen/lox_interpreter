@@ -8,6 +8,7 @@
 #include "DerivedObject.h"
 #include <unordered_map>
 #include <Stack.h>
+#include <debug.h>
 
 class Object;
 class FunctionObj;
@@ -19,7 +20,11 @@ private:
 //    int ip;
     std::vector<CallFrame> callFrames;
     // stack should not be resized because upValue.position needs to refer to a fixed address.
+#ifdef VECTOR
+    std::vector<Value> stack;
+#else
     Stack<Value, 16384> stack;
+#endif
     std::unordered_map<StringObj*, Value> globals;
 public:
     // should take in a functionObj

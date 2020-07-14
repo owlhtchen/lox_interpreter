@@ -7,5 +7,8 @@
 #include <stdexcept>
 
 extern std::vector<std::string> tokentype_to_string;
+#ifndef VECTOR
+// #define VECTOR
+#endif
 
 #endif //LOX_INTERPRETER_DEBUG_H

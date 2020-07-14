@@ -245,13 +245,16 @@ void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
         stmt->accept(*this);
     }
     int lastLine = stmts.empty()? 0 : stmts.back()->getLastLine();
-    std::shared_ptr<FunctionCompiler> newFunctionCompiler = currentCompiler;
+     std::shared_ptr<FunctionCompiler> newFunctionCompiler = currentCompiler;
     FunctionObj* functionObj = endCurrentCompiler(lastLine);
     auto chunk = getCurrentChunk();
+//    auto chunk = &newFunctionCompiler->functionObj->chunk;
     auto index = chunk->addConstant(functionObj, funcNameLine);
 //    chunk->emitOpCodeByte(OpCode::OP_CONSTANT, index, funcNameLine);
     chunk->emitOpCodeByte(OpCode::OP_CLOSURE, index, funcNameLine);
     // newFunctionCompiler.enclosing == currentCompiler
+    std::cerr << "-- gc emitting:  " << newFunctionCompiler->upValues.size()
+        << " upvalues in " << currentCompiler->functionObj->toString() << std::endl;
     for(const auto & upValue: newFunctionCompiler->upValues) {
         chunk->emitByte(upValue.index, funcNameLine);
         chunk->emitByte(upValue.isLocal ? 1 : 0, funcNameLine);
@@ -259,7 +262,12 @@ void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
 
     defineVariable(funcNameIndex, funcNameLine);
 
-    currentCompiler->endScope(functionStmt.getLastLine());
+    /*
+    should NOT call endScope after visitFunctionStmt
+    because op return already pops all remaining local variable from the stack
+    and op return should deal with capturing local variable as closed upvalue (instead of popping)
+     // currentCompiler->endScope(functionStmt.getLastLine());
+     * */
 }
 
 void CodeGenerator::visitCallExpr(const CallExpr &callExpr) {

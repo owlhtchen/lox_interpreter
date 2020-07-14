@@ -21,6 +21,16 @@ fun outer() {
 }
 outer();
 
+// var x = "global";
+// fun outer() {
+//   var x = "outer";
+//   fun inner() {
+//     print x;
+//   }
+//   inner();
+// }
+// outer();
+
 // 2
 // fun hello() {
 //     fun world () {

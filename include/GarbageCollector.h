@@ -8,7 +8,7 @@
 class GarbageCollector {
 private:
     Object* allObjects;
-    UpValueObj* allOpenUpValues;
+    UpValueObj* allOpenUpValues;  // sorted by UpValueObj.location
     // private constructor
     GarbageCollector(): allObjects(nullptr) {};
 public:
@@ -19,6 +19,7 @@ public:
     template <typename T>
     T* addObject(T* _object);
     void freeAllObjects();
+    UpValueObj* addUpValue(Value* location);
 };
 
 template <typename T>

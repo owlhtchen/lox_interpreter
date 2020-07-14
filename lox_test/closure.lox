@@ -1,23 +1,16 @@
-// var globalSet;
-// var globalGet;
-//
-// fun main() {
-//   var a = "initial";
-//
-//   fun set() { a = "updated"; }
-//   fun get() { print a; }
-//
-//   globalSet = set;
-//   globalGet = get;
-//   // globalSet();
-//   // globalGet();
-// }
-//
-// main();
-// globalSet();
-// globalGet();
-var x = "global";
-fun outer() {
-    print "hello";
+var globalSet;
+var globalGet;
+
+fun main() {
+    var a = "initial";
+
+    fun set() { a = "updated"; }
+    fun get() { print a; }
+
+    globalSet = set;
+    globalGet = get;
 }
-outer();
+
+main();
+globalSet();
+globalGet();

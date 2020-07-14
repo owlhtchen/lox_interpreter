@@ -2,8 +2,13 @@
 #include <VM.h>
 #include <DerivedObject.h>
 #include <iostream>
+#include <debug.h>
 
-VM::VM() = default;
+VM::VM() {
+#ifdef VECTOR
+    stack.reserve(10000);
+#endif
+}
 
 int VM::createCallFrame(ClosureObj* callableObj, int stackBase) {
     callFrames.push_back(CallFrame(callableObj, stackBase, *this));
