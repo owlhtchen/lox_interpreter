@@ -8,10 +8,10 @@
 class GarbageCollector {
 private:
     Object* allObjects;
-    UpValueObj* allOpenUpValues;  // sorted by UpValueObj.location
     // private constructor
     GarbageCollector(): allObjects(nullptr) {};
 public:
+    UpValueObj* allOpenUpValues;  // sorted by UpValueObj.location
     // prevent compiler from generating copy & assignment methods
     GarbageCollector(GarbageCollector const& copy) = delete;
     GarbageCollector& operator= (GarbageCollector const& copy) = delete;

@@ -99,7 +99,6 @@ int FunctionCompiler::resolveUpValue(const Token &varName) {
         index = enclosing->resolveUpValue(varName);
     }
     if(index != -1) { // index of varName captured as upValue in enclosing.upValues
-        std::cout << " !resolved recurse: " << varName.lexeme << " " << std::to_string(index) << std::endl;
         return addUpValue(index, false, varName.line);
     }
     return -1;

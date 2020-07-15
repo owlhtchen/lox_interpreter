@@ -130,8 +130,11 @@ void CallFrame::runFrame() {
                 // returnValue should be on stackTop
                 Value returnValue = popStack();
                 // close all upValueObj with location >= &vm.stack[stackBase] before popping those values
-                closeUpValues(&vm.stack[stackBase]);
+//                closeUpValues(&vm.stack[stackBase]);
                 while(vm.stack.size() > stackBase) { // pop all local variables for func call
+//                    std::cerr << "~ pop " << toString(vm.stack.back()) << " from "
+//                        << closureObj/->toString() << std::endl;
+                    closeUpValue();
                     vm.stack.pop_back();
                 }
                 vm.stack.push_back(returnValue);
@@ -196,13 +199,10 @@ void CallFrame::runFrame() {
                     if(isLocal) {
                         auto tmp = captureUpValue(upValueIndex);
                         newClosure->upValues.push_back(tmp);
-//                         closureObj->upValues.push_back(tmp);
                     } else {
                         newClosure->upValues.push_back(closureObj->upValues[upValueIndex]);
-//                        closureObj->upValues.push_back(closureObj->upValues[upValueIndex]);
                     }
                 }
-                std::cerr << "closure size of " << newClosure->toString() << " :" << newClosure->upValues.size() << std::endl;
                 pushStack(newClosure);
                 break;
             }
@@ -215,9 +215,6 @@ void CallFrame::runFrame() {
             case OpCode::OP_SET_UPVALUE: {
                 int upValueIndex = readByte();
                 auto newValue = peekStackTop();
-                std::cerr << "-- OP_SET_UPVALUE in " << closureObj->toString() << std::endl;
-                std::cerr << "-- original: " << toString(*closureObj->upValues[upValueIndex]->location);
-                std::cerr << "-- new: " << toString(newValue);
                 *closureObj->upValues[upValueIndex]->location = newValue;
                 break;
             }
@@ -262,27 +259,24 @@ Value CallFrame::popStack() {
 }
 
 void CallFrame::closeUpValue() {
-    std::cerr << "-- closeUpValue: " << closureObj->toString() << " ";
     Value* ptr = &vm.stack.indexFromEnd(0);
-    auto & upValues = closureObj->upValues;
-    for(int i = upValues.size() - 1; i >= 0 && upValues[i]->location >= ptr; i--) {
-        if(upValues[i]->location == ptr) {
-            std::cerr << upValues[i]->toString() << " ";
-            upValues[i]->closed = *ptr;
-            upValues[i]->location = &upValues[i]->closed;
+    auto & upValues = GarbageCollector::getInstance().allOpenUpValues;
+    while (upValues != nullptr && upValues->location >= ptr) {
+        if(upValues->location == ptr) {
+            upValues->closed = *ptr;
+            upValues->location = &upValues->closed;
             break;
         }
+        upValues = upValues->next;
     }
-    std::cerr << std::endl;
 }
 
 void CallFrame::closeUpValues(Value* location) {
     std::cerr << "closeUpValues(): " << closureObj->toString() << " ";
-    auto & upValues = closureObj->upValues;
-    for(int i = upValues.size() - 1; i >= 0 && upValues[i]->location >= location; i--) {
-        std::cerr << upValues[i]->toString() << " ";
-        upValues[i]->closed = *upValues[i]->location;
-        upValues[i]->location = &upValues[i]->closed;
+    auto & upValues = GarbageCollector::getInstance().allOpenUpValues;
+    while (upValues != nullptr && upValues->location >= location) {
+        upValues->closed = *upValues->location;
+        upValues->location = &upValues->closed;
     }
     std::cerr << std::endl;
 }
@@ -305,7 +299,6 @@ Value CallFrame::peekStackTop(int relativeIndex) {
 }
 
 void CallFrame::setStackBase(int relativeIndex, const Value &newValue) {
-    std::cout << "- setStackBase" << std::endl;
     vm.stack[stackBase + relativeIndex] = newValue;
 }
 

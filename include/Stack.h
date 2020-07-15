@@ -50,8 +50,8 @@ T Stack<T, N>::back() {
 
 template<typename T, int N>
 T &Stack<T, N>::operator[](int index) {
-    std::cerr << "operator[]() :" << "index: " << index << "top: " << top << std::endl;
-    printStack();
+//    std::cerr << "operator[]() :" << "index: " << index << "top: " << top << std::endl;
+//    printStack();
     assert((index >= 0 && index < top) && "[]: index out of stack range" );
     return _stack[index];
 
@@ -61,7 +61,7 @@ template<typename T, int N>
 T &Stack<T, N>::indexFromEnd(int endIndex) {
     // 0: element on _stack top
     int index = top - 1 - endIndex;
-    std::cerr << "indexFromEnd() :" << "index: " << index << "top: " << top << std::endl;
+//    std::cerr << "indexFromEnd() :" << "index: " << index << "top: " << top << std::endl;
     assert((index >= 0 && index < top) && "indexfromEnd: index out of stack range");
     return _stack[index];
 }

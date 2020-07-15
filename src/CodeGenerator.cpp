@@ -248,13 +248,10 @@ void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
      std::shared_ptr<FunctionCompiler> newFunctionCompiler = currentCompiler;
     FunctionObj* functionObj = endCurrentCompiler(lastLine);
     auto chunk = getCurrentChunk();
-//    auto chunk = &newFunctionCompiler->functionObj->chunk;
     auto index = chunk->addConstant(functionObj, funcNameLine);
 //    chunk->emitOpCodeByte(OpCode::OP_CONSTANT, index, funcNameLine);
     chunk->emitOpCodeByte(OpCode::OP_CLOSURE, index, funcNameLine);
     // newFunctionCompiler.enclosing == currentCompiler
-    std::cerr << "-- gc emitting:  " << newFunctionCompiler->upValues.size()
-        << " upvalues in " << currentCompiler->functionObj->toString() << std::endl;
     for(const auto & upValue: newFunctionCompiler->upValues) {
         chunk->emitByte(upValue.index, funcNameLine);
         chunk->emitByte(upValue.isLocal ? 1 : 0, funcNameLine);
