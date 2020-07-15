@@ -73,4 +73,15 @@ public:
     int getLastLine() const override ;
 };
 
+class ClassStmt: public Stmt {
+public:
+    Token name;
+    std::vector<std::unique_ptr<Stmt>> methods;
+    int lastLine;
+    ClassStmt(Token name, std::vector<std::unique_ptr<Stmt>> methods, int lastLine):
+        name(std::move(name)), methods(std::move(methods)), lastLine(lastLine) { };
+    void accept(VisitorStmt& visitor) const override ;
+    int getLastLine() const override ;
+};
+
 #endif //LOX_INTERPRETER_STMT_H

@@ -1,6 +1,7 @@
 
 #include <Parser.h>
 #include <Expr.h>
+#include <Stmt.h>
 #include <Error.h>
 #include <stdexcept>
 #include <utility>
@@ -180,6 +181,18 @@ std::unique_ptr<Stmt> Parser::funcDecl() {
     return std::make_unique<FunctionStmt>(funcName, std::move(params), std::move(body));
 }
 
+std::unique_ptr<Stmt> Parser::classDecl() {
+    Token name = tokens[current++];
+    std::vector<std::unique_ptr<Stmt>> methods;
+    consume(TOKEN_LEFT_BRACE, "{ expected for class declaration");
+    while(!isAtEnd() && peek(0).type != TOKEN_RIGHT_BRACE) {
+        methods.push_back(funcDecl());
+    }
+    consume(TOKEN_RIGHT_BRACE, "} expected for class declaration");
+    int lastLine = methods.empty() ? 0 : methods.back()->getLastLine();
+    return std::make_unique<ClassStmt>(std::move(name), std::move(methods), lastLine);
+}
+
 std::unique_ptr<Stmt> Parser::declaration() {
     if(match(TOKEN_VAR)) { // varDecl
         Token varToken = tokens[current++];
@@ -191,7 +204,9 @@ std::unique_ptr<Stmt> Parser::declaration() {
         return std::make_unique<VarDeclStmt>(varToken, std::move(expr));
     } else if(match(TOKEN_FUN)) { // function declaration
         return funcDecl();
-    } else { // statement
+    } else if (match(TOKEN_CLASS)) {
+        return classDecl();
+    }else { // statement
         return statement();
     }
 }

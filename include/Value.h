@@ -19,4 +19,9 @@ T* castToObj(Value* value) {
     return (*tmp)->dyn_cast<T>();
 }
 
+template <typename T>
+bool isObj(Value* value) {
+    return castToObj<T>(value) != nullptr;
+}
+
 #endif //LOX_INTERPRETER_VALUE_H

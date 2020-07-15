@@ -38,6 +38,7 @@ public:
     void consume(TokenType type, std::string err_msg); // the Error thrown from here should be caught in parseStmt to synchronize
     Token peek(int relative_pos);
     std::unique_ptr<Stmt> funcDecl();
+    std::unique_ptr<Stmt> classDecl();
 };
 
 

@@ -10,15 +10,11 @@ VM::VM() {
 #endif
 }
 
-int VM::createCallFrame(ClosureObj* callableObj, int stackBase) {
+int VM::createCallFrame(ClosureObj* callableObj, int argCount) {
+    int stackBase = stack.size() - 1 - argCount;
     callFrames.push_back(CallFrame(callableObj, stackBase, *this));
     return callFrames.size() - 1;
 }
-
-void VM::setUpFunctionCall(ClosureObj *callableObj, int argCount) {
-    createCallFrame(callableObj, stack.size() - 1 - argCount);
-}
-
 
 void VM::run() {
     while (!callFrames.empty()) {
@@ -29,9 +25,9 @@ void VM::run() {
 }
 
 void VM::start(FunctionObj *functionObj) {
-    std::cout << "vm started" << std::endl;
+    std::cout << " --- vm started ---" << std::endl;
     auto closureObj = new ClosureObj(functionObj);
     stack.push_back(closureObj);
-    setUpFunctionCall(closureObj, 0);
+    createCallFrame(closureObj, 0);
     run();
 }

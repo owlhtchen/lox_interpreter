@@ -268,7 +268,7 @@ void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
 }
 
 void CodeGenerator::visitCallExpr(const CallExpr &callExpr) {
-    compileExpr(*callExpr.callee); // push callee (as functionObj in Value) onto stack
+    compileExpr(*callExpr.callee); // push callee (e.g. as closureObj in Value) onto stack
     int actualArity = 0;
     for(const auto& argument: callExpr.arguments) {
         // push arguments onto stack
@@ -292,5 +292,15 @@ void CodeGenerator::visitReturnStmt(const ReturnStmt &returnStmt) {
         chunk->emitByte(static_cast<uint8_t>(OpCode::OP_NIL), line);
     }
     chunk->emitByte(static_cast<uint8_t>(OpCode::OP_RETURN), line);
+}
+
+void CodeGenerator::visitClassStmt(const ClassStmt &classStmt) {
+    auto index = declareVariable(classStmt.name);
+
+    auto chunk = getCurrentChunk();
+    // TODO methods?
+    chunk->emitOpCodeByte(OpCode::OP_CLASS, index, classStmt.name.line);
+
+    defineVariable(index, classStmt.getLastLine());
 }
 

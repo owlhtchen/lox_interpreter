@@ -7,6 +7,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <GarbageCollector.h>
+#include <stdexcept>
 #include <debug.h>
 
 void CallFrame::runFrame() {
@@ -132,8 +133,6 @@ void CallFrame::runFrame() {
                 // close all upValueObj with location >= &vm.stack[stackBase] before popping those values
 //                closeUpValues(&vm.stack[stackBase]);
                 while(vm.stack.size() > stackBase) { // pop all local variables for func call
-//                    std::cerr << "~ pop " << toString(vm.stack.back()) << " from "
-//                        << closureObj/->toString() << std::endl;
                     closeUpValue();
                     vm.stack.pop_back();
                 }
@@ -145,7 +144,7 @@ void CallFrame::runFrame() {
             }
             case OpCode::OP_DEFINE_GLOBAL: {
                 StringObj* varName = std::get<Object*>(readConstant())->cast<StringObj>();
-                vm.globals[varName] = popStack();
+                vm.globals[varName] = popStack();  // TODO: GC bug?
                 break;
             }
             case OpCode::OP_GET_GLOBAL: {
@@ -176,16 +175,7 @@ void CallFrame::runFrame() {
             case OpCode::OP_CALL: {
                 uint8_t actualArity = readByte();
                 auto value = peekStackTop(actualArity);
-                auto closure = castToObj<ClosureObj>(&value);
-                auto function = closure->functionObj;
-                if(function->getArity() != actualArity) {
-                    std::string errMsg = "function " + function->getName() + " expects " +
-                            std::to_string(function->getArity()) + " argument(s), but got " +
-                            std::to_string(actualArity) + " argument(s)";
-                    throw RuntimeError(getCurrentLine(),
-                            errMsg);
-                }
-                vm.setUpFunctionCall(closure, actualArity);
+                opCallValue(value, actualArity);
                 return;
                 break;
             }
@@ -212,6 +202,13 @@ void CallFrame::runFrame() {
                 pushStack(upValue);
                 break;
             }
+            case OpCode::OP_CLASS: {
+                Value classNameValue = readConstant();
+                auto className = castToObj<StringObj>(&classNameValue);
+                auto newClass = GarbageCollector::getInstance().addObject(new ClassObj(className));
+                pushStack(newClass);
+                break;
+            }
             case OpCode::OP_SET_UPVALUE: {
                 int upValueIndex = readByte();
                 auto newValue = peekStackTop();
@@ -222,6 +219,28 @@ void CallFrame::runFrame() {
                 throw std::logic_error("unhandled Opcode in CallFrame");
             }
         }
+    }
+}
+
+void CallFrame::opCallValue(Value callee, int actualArity) {
+    // ClosureObj ClassObj
+    if(isObj<ClosureObj>(&callee)) {
+        auto closure = castToObj<ClosureObj>(&callee);
+        auto function = closure->functionObj;
+        if(function->getArity() != actualArity) {
+            std::string errMsg = "function " + function->getName() + " expects " +
+                                 std::to_string(function->getArity()) + " argument(s), but got " +
+                                 std::to_string(actualArity) + " argument(s)";
+            throw RuntimeError(getCurrentLine(),
+                               errMsg);
+        }
+        vm.createCallFrame(closure, actualArity);
+    } else if(isObj<ClassObj>(&callee)) {
+        auto classObj = castToObj<ClassObj>(&callee);
+        auto instanceObj = GarbageCollector::getInstance().addObject(new InstanceObj(classObj));
+        vm.stack.indexFromEnd(actualArity) = instanceObj;  // replacing original callee (classObj)
+    } else {
+        throw std::logic_error("unhandled callee in opCallValue");
     }
 }
 
@@ -272,17 +291,14 @@ void CallFrame::closeUpValue() {
 }
 
 void CallFrame::closeUpValues(Value* location) {
-    std::cerr << "closeUpValues(): " << closureObj->toString() << " ";
     auto & upValues = GarbageCollector::getInstance().allOpenUpValues;
     while (upValues != nullptr && upValues->location >= location) {
         upValues->closed = *upValues->location;
         upValues->location = &upValues->closed;
     }
-    std::cerr << std::endl;
 }
 
 Value CallFrame::peekStackBase(int relativeIndex) {
-//    std::cerr << "- peekStackBase" << std::endl;
     return vm.stack[stackBase + relativeIndex];
 }
 

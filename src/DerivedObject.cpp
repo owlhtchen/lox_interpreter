@@ -40,3 +40,18 @@ ClosureObj::ClosureObj(FunctionObj *functionObj):
 std::string UpValueObj::toString() {
     return "UpValue: " + ::toString(*location);
 }
+
+std::string ClassObj::toString() {
+    return "Class: " + name->toString();
+}
+
+std::string InstanceObj::toString() {
+    std::string str = "Instance: of " + klass->toString();
+    if(!fields.empty()) {
+        str += " with field(s): ";
+        for(auto const & pair: fields) {
+            str += "{" + pair.first->toString() + ": " + ::toString(pair.second) + "} ";
+        }
+    }
+    return str;
+}

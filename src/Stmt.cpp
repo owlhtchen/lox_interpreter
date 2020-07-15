@@ -50,3 +50,11 @@ void ReturnStmt::accept(VisitorStmt &visitor) const {
 int ReturnStmt::getLastLine() const {
     return returnKeyword.line;
 }
+
+void ClassStmt::accept(VisitorStmt &visitor) const {
+    visitor.visitClassStmt(*this);
+}
+
+int ClassStmt::getLastLine() const {
+    return lastLine;
+}

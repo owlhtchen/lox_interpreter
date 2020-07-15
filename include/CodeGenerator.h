@@ -42,6 +42,7 @@ private:
     void visitFunctionStmt(const FunctionStmt& functionStmt) override ;
     void visitCallExpr(const CallExpr& callExpr) override ;
     void visitReturnStmt(const ReturnStmt& returnStmt) override ;
+    void visitClassStmt(const ClassStmt& classStmt) override ;
     FunctionObj* endCurrentCompiler(int line);
 
 };

@@ -76,4 +76,21 @@ public:
     std::string toString() override ;
 };
 
+class ClassObj: public Object {
+public:
+    StringObj* name;
+    std::unordered_map<StringObj*, FunctionObj*> methods;
+    explicit ClassObj(StringObj* name): name(name) { };
+    std::string toString() override;
+};
+
+class InstanceObj: public Object {
+public:
+    ClassObj* klass;
+    std::unordered_map<StringObj*, Value> fields;
+    explicit InstanceObj(ClassObj* klass):
+        klass(klass) { };
+    std::string toString() override ;
+};
+
 #endif //LOX_INTERPRETER_DERIVEDOBJECT_H

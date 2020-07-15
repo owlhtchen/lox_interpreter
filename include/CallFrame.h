@@ -41,6 +41,7 @@ public:
     UpValueObj* captureUpValue(int localVarIndex);
     void closeUpValue();
     void closeUpValues(Value* location);
+    void opCallValue(Value callee, int actualArity);
 };
 
 

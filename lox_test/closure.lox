@@ -1,5 +1,18 @@
 
 
+print " ------ 8 --------";
+var a = "global";
+{
+  fun showA() {
+    // closure captures global a, should print "global" twice
+    print a;
+  }
+
+  showA();
+  var a = "block";
+  showA();
+}
+
 print " ------ 7 --------";
 fun outer_cal() {
   var a = 1;
