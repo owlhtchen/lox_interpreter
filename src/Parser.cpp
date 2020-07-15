@@ -18,14 +18,19 @@ std::unique_ptr<Expr> Parser::expression() {
 }
 
 std::unique_ptr<Expr> Parser::assignment() {
+    // parse it as an normal expression, turn it into a AssignExpr/SetExpr if we see TOKEN_EQUAL
     std::unique_ptr<Expr> expr = equality();
     if(match(TOKEN_EQUAL)) {
-        auto* tmp = dynamic_cast<LiteralExpr*>(expr.get());
-        if(tmp != nullptr) {
-            return std::make_unique<AssignExpr>(tmp->token, expression());
-        } else {
-            throw RuntimeError(expr->getLastLine(), "invalid assignment target");
+        auto asIdentifier = dynamic_cast<LiteralExpr*>(expr.get());
+        if(asIdentifier != nullptr) {
+            return std::make_unique<AssignExpr>(asIdentifier->token, expression());
         }
+        auto asGetExpr = dynamic_cast<GetExpr*>(expr.get());
+        if(asGetExpr != nullptr) {
+            return std::make_unique<SetExpr>(std::move(asGetExpr->object), asGetExpr->field, expression());
+        }
+        throw RuntimeError(expr->getLastLine(), "invalid assignment target");
+
     } else {
         return expr;
     }
@@ -83,22 +88,29 @@ std::unique_ptr<Expr> Parser::unary() {
 }
 
 std::unique_ptr<Expr> Parser::call() {
-    // call  → primary ( "(" arguments? ")" )* ; // including f("a")("b")("c")
+    // call  → primary ( "(" arguments? ")" | "." IDENTIFIER )* ; // including f("a")("b")("c")
     std::unique_ptr<Expr> expr = primary();
     int line;
     std::vector<std::unique_ptr<Expr>> arguments;
-    while(match(TOKEN_LEFT_PAREN)) {
-        line = peek(-1).line;
-        if(peek(0).type != TOKEN_RIGHT_PAREN) {
-            do {
-                arguments.emplace_back(expression());
-            } while(match(TOKEN_COMMA));
+    while(true) {
+        if(match(TOKEN_LEFT_PAREN)) {
+            line = peek(-1).line;
+            if(peek(0).type != TOKEN_RIGHT_PAREN) {
+                do {
+                    arguments.emplace_back(expression());
+                } while(match(TOKEN_COMMA));
+            }
+            consume(TOKEN_RIGHT_PAREN, ") expected for function call, but get " + peek(-1).lexeme);
+            if(arguments.size() >= 255) {
+                throw CompileError(line, "more than 255 arguments in function call");
+            }
+            expr = std::make_unique<CallExpr>(std::move(expr), std::move(arguments), line);
+        } else if(match(TOKEN_DOT)) {
+            Token field = tokens[current++];
+            expr = std::make_unique<GetExpr>(std::move(expr), field);
+        } else {
+            break;
         }
-        consume(TOKEN_RIGHT_PAREN, ") expected for function call, but get " + peek(-1).lexeme);
-        if(arguments.size() >= 255) {
-            throw CompileError(line, "more than 255 arguments in function call");
-        }
-        expr = std::make_unique<CallExpr>(std::move(expr), std::move(arguments), line);
     }
     return expr;
 }

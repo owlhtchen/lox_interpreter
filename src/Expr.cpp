@@ -64,3 +64,19 @@ void CallExpr::accept(VisitorExpr &visitor) const {
 int CallExpr::getLastLine() const {
     return line;
 }
+
+void GetExpr::accept(VisitorExpr &visitor) const {
+    visitor.visitGetExpr(*this);
+}
+
+int GetExpr::getLastLine() const {
+    return field.line;
+}
+
+void SetExpr::accept(VisitorExpr &visitor) const {
+    visitor.visitSetExpr(*this);
+}
+
+int SetExpr::getLastLine() const {
+    return field.line;
+}

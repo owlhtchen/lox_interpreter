@@ -59,7 +59,7 @@ T &Stack<T, N>::operator[](int index) {
 
 template<typename T, int N>
 T &Stack<T, N>::indexFromEnd(int endIndex) {
-    // endIndex: starts from 0
+    // endIndex: 0, 1, 2, ...
     // 0: element on _stack top
     int index = top - 1 - endIndex;
 //    std::cerr << "indexFromEnd() :" << "index: " << index << "top: " << top << std::endl;

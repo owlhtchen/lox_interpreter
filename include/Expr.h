@@ -81,4 +81,27 @@ public:
     ~CallExpr() override = default;
 };
 
+class GetExpr: public Expr {
+public:
+    std::unique_ptr<Expr> object;
+    Token field;
+    GetExpr(std::unique_ptr<Expr> object, Token field):
+            object(std::move(object)), field(std::move(field)) { };
+    void accept(VisitorExpr& visitor) const override ;
+    int getLastLine() const override ;
+    ~GetExpr() override = default;
+};
+
+class SetExpr: public Expr {
+public:
+    std::unique_ptr<Expr> object;
+    Token field;
+    std::unique_ptr<Expr> value;
+    SetExpr(std::unique_ptr<Expr> object, Token field, std::unique_ptr<Expr> value):
+            object(std::move(object)), field(std::move(field)), value(std::move(value)) { };
+    void accept(VisitorExpr& visitor) const override ;
+    int getLastLine() const override ;
+    ~SetExpr() override = default;
+};
+
 #endif //LOX_INTERPRETER_EXPR_H

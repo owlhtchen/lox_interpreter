@@ -215,8 +215,39 @@ void CallFrame::runFrame() {
                 *closureObj->upValues[upValueIndex]->location = newValue;
                 break;
             }
+            case OpCode::OP_GET_PROPERTY: {
+                auto object = peekStackTop(0);
+                auto instanceObj = castToObj<InstanceObj>(&object);
+                if(instanceObj == nullptr) {
+                    throw RuntimeError(getCurrentLine(), "only instance can get field");
+                }
+                auto fieldName = readConstant();
+                auto field = castToObj<StringObj>(&fieldName);
+                auto iter = instanceObj->fields.find(field);
+                if(iter == instanceObj->fields.end()) {
+                    throw RuntimeError(getCurrentLine(),  instanceObj->toString() + " has no field " + field->toString());
+                } else {
+                    popStack();
+                    pushStack(iter->second);
+                }
+                break;
+            }
+            case OpCode::OP_SET_PROPERTY: {
+                auto newValue = peekStackTop(1);
+                auto object = peekStackTop(0);
+                auto instanceObj = castToObj<InstanceObj>(&object);
+                if(instanceObj == nullptr) {
+                    throw RuntimeError(getCurrentLine(), "only instance can set field");
+                }
+                auto fieldName = readConstant();
+                auto field = castToObj<StringObj>(&fieldName);
+                instanceObj->fields[field] = newValue;
+                popStack();
+                break;
+            }
             default: {
-                throw std::logic_error("unhandled Opcode in CallFrame");
+                auto temp = static_cast<uint8_t >(currentOpcode);
+                throw std::logic_error("unhandled Opcode in CallFrame: " + std::to_string(temp));
             }
         }
     }

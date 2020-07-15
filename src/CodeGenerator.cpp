@@ -304,3 +304,24 @@ void CodeGenerator::visitClassStmt(const ClassStmt &classStmt) {
     defineVariable(index, classStmt.getLastLine());
 }
 
+void CodeGenerator::visitGetExpr(const GetExpr &getExpr) {
+    compileExpr(*getExpr.object);
+    auto chunk = getCurrentChunk();
+    int line = getExpr.getLastLine();
+    StringObj* name = StringPool::getInstance().getStringObj(getExpr.field.lexeme);
+    auto fieldName = chunk->addConstant(name, line);
+    chunk->emitOpCodeByte(OpCode::OP_GET_PROPERTY, fieldName, line);
+}
+
+
+void CodeGenerator::visitSetExpr(const SetExpr &setExpr) {
+    int line = setExpr.getLastLine();
+    // push new value on stack
+    compileExpr(*setExpr.value);
+    // push object on stack
+    compileExpr(*setExpr.object);
+    auto chunk = getCurrentChunk();
+    StringObj* name = StringPool::getInstance().getStringObj(setExpr.field.lexeme);
+    auto fieldName = chunk->addConstant(name, line);
+    chunk->emitOpCodeByte(OpCode::OP_SET_PROPERTY, fieldName, line);
+}

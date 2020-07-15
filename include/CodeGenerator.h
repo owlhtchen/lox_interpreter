@@ -15,6 +15,8 @@
 class FunctionCompiler;
 class FunctionObj;
 class StringObj;
+class GetExpr;
+class SetExpr;
 
 class CodeGenerator: public VisitorExpr, public VisitorStmt {
 public:
@@ -43,6 +45,8 @@ private:
     void visitCallExpr(const CallExpr& callExpr) override ;
     void visitReturnStmt(const ReturnStmt& returnStmt) override ;
     void visitClassStmt(const ClassStmt& classStmt) override ;
+    void visitGetExpr(const GetExpr & getExpr) override ;
+    void visitSetExpr(const SetExpr & setExpr) override ;
     FunctionObj* endCurrentCompiler(int line);
 
 };
