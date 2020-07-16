@@ -42,6 +42,7 @@ public:
     void closeUpValue();
     void closeUpValues(Value* location);
     void opCallValue(Value callee, int actualArity);
+    void addUpValuesToClosure(ClosureObj* closureObj);
 };
 
 

@@ -14,6 +14,7 @@ void CallFrame::runFrame() {
     OpCode currentOpcode;
     Value second, first;
     auto& chunk = getCurrentChunk();
+    std::cerr << " in call frame of " << closureObj->toString() << std::endl;
 
     while(ip < chunk.code.size()) {
         currentOpcode = readOpCode();
@@ -184,16 +185,7 @@ void CallFrame::runFrame() {
                 auto functionValue = readConstant();
                 auto newFunction = castToObj<FunctionObj>(&functionValue);
                 auto newClosure = GarbageCollector::getInstance().addObject(new ClosureObj(newFunction));
-                for(int i = 0; i < newClosure->closureCount; i++) {
-                    int upValueIndex = readByte();
-                    int isLocal = readByte();
-                    if(isLocal) {
-                        auto tmp = captureUpValue(upValueIndex);
-                        newClosure->upValues.push_back(tmp);
-                    } else {
-                        newClosure->upValues.push_back(closureObj->upValues[upValueIndex]);
-                    }
-                }
+                addUpValuesToClosure(newClosure);
                 pushStack(newClosure);
                 break;
             }
@@ -268,6 +260,23 @@ void CallFrame::runFrame() {
                 popStack();
                 break;
             }
+            case OpCode::OP_INVOKE: {
+                auto nameValue = readConstant();
+                auto methodName = castToObj<StringObj>(&nameValue);
+                auto actualArity = readByte();
+                auto objectValue = peekStackTop(actualArity);
+                auto object = castToObj<InstanceObj>(&objectValue);
+                auto methodIter = object->klass->methods.find(methodName);
+                if(methodIter != object->klass->methods.end()) {
+                    opCallValue(methodIter->second, actualArity);
+                    return;
+                    break;
+                }
+
+                throw RuntimeError(getCurrentLine(), "cannot invoke "
+                    + object->toString() + "." + methodIter->second->toString());
+                break;
+            }
             default: {
                 auto temp = static_cast<uint8_t >(currentOpcode);
                 throw std::logic_error("unhandled Opcode in CallFrame: " + std::to_string(temp));
@@ -312,6 +321,19 @@ void CallFrame::opCallValue(Value callee, int actualArity) {
         vm.createCallFrame(classMethodObj->method, actualArity);
     } else {
         throw std::logic_error("unhandled callee in opCallValue: " + toString(callee));
+    }
+}
+
+void CallFrame::addUpValuesToClosure(ClosureObj* newClosure) {
+    for(int i = 0; i < newClosure->closureCount; i++) {
+        int upValueIndex = readByte();
+        int isLocal = readByte();
+        if(isLocal) {
+            auto tmp = captureUpValue(upValueIndex);
+            newClosure->upValues.push_back(tmp);
+        } else {
+            newClosure->upValues.push_back(closureObj->upValues[upValueIndex]);
+        }
     }
 }
 

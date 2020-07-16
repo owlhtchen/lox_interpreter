@@ -1,32 +1,33 @@
- print " -------------- 3 --------------------- ";
- class Brunch {
-   init(food, drink) {
-        this.food = food;
-        this.drink = drink;
-        return;
-   }
- }
- var brunch = Brunch("eggs", "coffee");
- print brunch;
- print brunch.food + " " + brunch.drink;
-
-// print " -------------- 2 --------------------- ";
-// class Person {
-//   sayName() {
-//     print this.name;
-//   }
-//   sayFamily() {
-//     print this.family;
+// print " -------------- 3 --------------------- ";
+// class Brunch {
+//   init(food, drink) {
+//        this.food = food;
+//        this.drink = drink;
+//        return;
 //   }
 // }
-//
-// var jane = Person();
-// jane.name = "Jane";
-//
+// var brunch = Brunch("eggs", "coffee");
+// print brunch;
+// print brunch.food + " " + brunch.drink;
+
+ print " -------------- 2 --------------------- ";
+ class Person {
+   sayName() {
+     print this.name;
+   }
+   sayFamily() {
+     print this.family;
+   }
+ }
+
+ var jane = Person();
+ jane.name = "Jane";
+ jane.sayName();
+ jane.sayName();
+
 // var method = jane.sayName;
 // method();
 // jane.name = "Changed";
-// // jane.sayFamily();
 // jane.family = "Li";
 // print jane;
 // method();

@@ -9,6 +9,7 @@
 #include <DerivedObject.h>
 #include <iostream>
 #include <FunctionType.h>
+#include <memory>
 
 void CodeGenerator::visitLiteralExpr(const LiteralExpr &expr) {
     auto line = expr.token.line;
@@ -289,16 +290,34 @@ void CodeGenerator::visitFunctionStmt(const FunctionStmt& functionStmt) {
      * */
 }
 
-void CodeGenerator::visitCallExpr(const CallExpr &callExpr) {
-    compileExpr(*callExpr.callee); // push callee (e.g. as closureObj in Value) onto stack
+int CodeGenerator::compileArguments(const std::vector<std::unique_ptr<Expr>> & arguments) {
     int actualArity = 0;
-    for(const auto& argument: callExpr.arguments) {
+    for(const auto& argument: arguments) {
         // push arguments onto stack
         compileExpr(*argument);
         actualArity++;
     }
+    return actualArity;
+}
+
+void CodeGenerator::visitCallExpr(const CallExpr &callExpr) {
+    int line = callExpr.getLastLine();
     auto chunk = getCurrentChunk();
-    chunk->emitOpCodeByte(OpCode::OP_CALL, actualArity, callExpr.line);
+    auto ptr = callExpr.callee.get();
+    auto calleeGetExpr = dynamic_cast<GetExpr*>(ptr);
+    if(calleeGetExpr == nullptr) {
+        compileExpr(*callExpr.callee); // push callee (e.g. as closureObj in Value) onto stack
+        int actualArity = compileArguments(callExpr.arguments);
+        chunk->emitOpCodeByte(OpCode::OP_CALL, actualArity, line);
+    } else { // e.g. object.method(arguments)
+        compileExpr(*calleeGetExpr->object);  // push object on stack
+        StringObj* method = StringPool::getInstance().getStringObj(calleeGetExpr->field.lexeme);
+        auto methodName = chunk->addConstant(method, line);
+        int actualArity = compileArguments(callExpr.arguments); // push arguments on stack
+        chunk->emitOpCodeByte(OpCode::OP_INVOKE, methodName, line);
+        chunk->emitByte(actualArity, line);
+    }
+
 }
 
 void CodeGenerator::visitReturnStmt(const ReturnStmt &returnStmt) {
