@@ -10,6 +10,7 @@
 #include <Value.h>
 #include <Token.h>
 #include "DerivedObject.h"
+#include <FunctionType.h>
 
 
 class FunctionCompiler;
@@ -17,6 +18,7 @@ class FunctionObj;
 class StringObj;
 class GetExpr;
 class SetExpr;
+class FunctionStmt;
 
 class CodeGenerator: public VisitorExpr, public VisitorStmt {
 public:
@@ -48,7 +50,8 @@ private:
     void visitGetExpr(const GetExpr & getExpr) override ;
     void visitSetExpr(const SetExpr & setExpr) override ;
     FunctionObj* endCurrentCompiler(int line);
-
+    void getVariable(const Token& token);  // emit OpCode to push variable onto stack
+    void compileFunctionStmt(const FunctionStmt & functionStmt, FunctionType functionType);  // closureObj compiled from functionStmt will be on stack top
 };
 
 #endif //LOX_INTERPRETER_CODEGENERATOR_H

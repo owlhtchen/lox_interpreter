@@ -1,8 +1,26 @@
- class Pair {}
- print Pair;
+ print " -------------- 2 --------------------- ";
+ class Person {
+   sayName() {
+     print this.name;
+   }
+ }
 
- var pair = Pair();
- print pair;
-pair.first = 1;
-pair.second = 2;
-print pair.first + pair.second; // 3.
+ var jane = Person();
+ jane.name = "Jane";
+
+ var method = jane.sayName;
+ method();
+ jane.name = "Changed";
+ jane.family = "unknown";
+ print jane;
+ method();
+
+// print " -------------- 1 --------------------- ";
+// class Pair {}
+// print Pair;
+//
+// var pair = Pair();
+// print pair;
+// pair.first = 1;
+// pair.second = 2;
+// print pair.first + pair.second; // 3.

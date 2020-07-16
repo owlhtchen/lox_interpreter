@@ -55,3 +55,7 @@ std::string InstanceObj::toString() {
     }
     return str;
 }
+
+std::string ClassMethodObj::toString() {
+    return "method + (" + method->toString() + ") of instance " + "(" + receiver->toString() + ")";
+}

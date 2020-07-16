@@ -22,7 +22,7 @@ UpValueObj *GarbageCollector::addUpValue(Value *location) {
     auto newUpValue = new UpValueObj(location);
     if(allOpenUpValues == nullptr) {
         allOpenUpValues = newUpValue;
-        return newUpValue;
+        return GarbageCollector::getInstance().addObject(newUpValue);
     } else {
         UpValueObj *current, *prev;
         prev = nullptr;
@@ -41,7 +41,7 @@ UpValueObj *GarbageCollector::addUpValue(Value *location) {
         } else {
             prev->next = newUpValue;
         }
-        return newUpValue;
+        return GarbageCollector::getInstance().addObject(newUpValue);
     }
 }
 

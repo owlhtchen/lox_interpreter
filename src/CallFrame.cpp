@@ -144,7 +144,8 @@ void CallFrame::runFrame() {
             }
             case OpCode::OP_DEFINE_GLOBAL: {
                 StringObj* varName = std::get<Object*>(readConstant())->cast<StringObj>();
-                vm.globals[varName] = popStack();  // TODO: GC bug?
+                vm.globals[varName] = peekStackTop(0);
+                popStack();
                 break;
             }
             case OpCode::OP_GET_GLOBAL: {
@@ -182,7 +183,7 @@ void CallFrame::runFrame() {
             case OpCode::OP_CLOSURE: {
                 auto functionValue = readConstant();
                 auto newFunction = castToObj<FunctionObj>(&functionValue);
-                auto newClosure = new ClosureObj(newFunction);
+                auto newClosure = GarbageCollector::getInstance().addObject(new ClosureObj(newFunction));
                 for(int i = 0; i < newClosure->closureCount; i++) {
                     int upValueIndex = readByte();
                     int isLocal = readByte();
@@ -223,13 +224,22 @@ void CallFrame::runFrame() {
                 }
                 auto fieldName = readConstant();
                 auto field = castToObj<StringObj>(&fieldName);
-                auto iter = instanceObj->fields.find(field);
-                if(iter == instanceObj->fields.end()) {
-                    throw RuntimeError(getCurrentLine(),  instanceObj->toString() + " has no field " + field->toString());
-                } else {
+                auto fieldIter = instanceObj->fields.find(field);
+                if(fieldIter != instanceObj->fields.end()) {
                     popStack();
-                    pushStack(iter->second);
+                    pushStack(fieldIter->second);
+                    break;
                 }
+                auto methodIter = instanceObj->klass->methods.find(field);
+                if(methodIter != instanceObj->klass->methods.end()) {
+                    auto classMethod = GarbageCollector::getInstance().addObject(
+                            new ClassMethodObj(instanceObj, methodIter->second));
+                    popStack();
+                    pushStack(classMethod);
+                    break;
+                }
+
+                throw RuntimeError(getCurrentLine(),  instanceObj->toString() + " has no field " + field->toString());
                 break;
             }
             case OpCode::OP_SET_PROPERTY: {
@@ -242,6 +252,17 @@ void CallFrame::runFrame() {
                 auto fieldName = readConstant();
                 auto field = castToObj<StringObj>(&fieldName);
                 instanceObj->fields[field] = newValue;
+                popStack();
+                break;
+            }
+            case OpCode::OP_METHOD: {
+                auto nameValue = readConstant();
+                auto methodName = castToObj<StringObj>(&nameValue);
+                auto klassValue = peekStackTop(1);
+                auto klass = castToObj<ClassObj>(&klassValue);
+                auto methodValue = peekStackTop(0);
+                auto method = castToObj<ClosureObj>(&methodValue);
+                klass->methods[methodName] = method;
                 popStack();
                 break;
             }
@@ -270,6 +291,10 @@ void CallFrame::opCallValue(Value callee, int actualArity) {
         auto classObj = castToObj<ClassObj>(&callee);
         auto instanceObj = GarbageCollector::getInstance().addObject(new InstanceObj(classObj));
         vm.stack.indexFromEnd(actualArity) = instanceObj;  // replacing original callee (classObj)
+    } else if(isObj<ClassMethodObj>(&callee)) {
+        auto classMethodObj = castToObj<ClassMethodObj>(&callee);
+        vm.stack.indexFromEnd(actualArity) = classMethodObj->receiver; // GC can blacken receiver from vm.stack
+        vm.createCallFrame(classMethodObj->method, actualArity);
     } else {
         throw std::logic_error("unhandled callee in opCallValue");
     }

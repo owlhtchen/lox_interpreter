@@ -117,7 +117,7 @@ std::unique_ptr<Expr> Parser::call() {
 
 
 std::unique_ptr<Expr> Parser::primary() {
-    if(match({TOKEN_NUMBER, TOKEN_STRING, TOKEN_TRUE, TOKEN_FALSE, TOKEN_NIL, TOKEN_IDENTIFIER})) {
+    if(match({TOKEN_NUMBER, TOKEN_STRING, TOKEN_TRUE, TOKEN_FALSE, TOKEN_NIL, TOKEN_IDENTIFIER, TOKEN_THIS})) {
         Token literal = peek(-1);
         return std::make_unique<LiteralExpr>(literal);
     } else if(match(TOKEN_LEFT_PAREN)) {
@@ -166,7 +166,7 @@ void Parser::consume(TokenType type, std::string err_msg ) {
     }
 }
 
-std::unique_ptr<Stmt> Parser::funcDecl() {
+std::unique_ptr<FunctionStmt> Parser::funcDecl() {
     Token funcName = tokens[current++];
     std::vector<Token> params;
     std::vector<std::unique_ptr<Stmt>> body;
@@ -195,7 +195,7 @@ std::unique_ptr<Stmt> Parser::funcDecl() {
 
 std::unique_ptr<Stmt> Parser::classDecl() {
     Token name = tokens[current++];
-    std::vector<std::unique_ptr<Stmt>> methods;
+    std::vector<std::unique_ptr<FunctionStmt>> methods;
     consume(TOKEN_LEFT_BRACE, "{ expected for class declaration");
     while(!isAtEnd() && peek(0).type != TOKEN_RIGHT_BRACE) {
         methods.push_back(funcDecl());

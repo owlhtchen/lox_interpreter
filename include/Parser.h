@@ -37,7 +37,7 @@ public:
     bool match(std::initializer_list<TokenType> types); // e.g. checkType({TOKEN_MINUS, TOKEN_BANG})
     void consume(TokenType type, std::string err_msg); // the Error thrown from here should be caught in parseStmt to synchronize
     Token peek(int relative_pos);
-    std::unique_ptr<Stmt> funcDecl();
+    std::unique_ptr<FunctionStmt> funcDecl();
     std::unique_ptr<Stmt> classDecl();
 };
 

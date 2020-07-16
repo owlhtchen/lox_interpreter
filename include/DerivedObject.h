@@ -79,7 +79,7 @@ public:
 class ClassObj: public Object {
 public:
     StringObj* name;
-    std::unordered_map<StringObj*, FunctionObj*> methods;
+    std::unordered_map<StringObj*, ClosureObj*> methods;
     explicit ClassObj(StringObj* name): name(name) { };
     std::string toString() override;
 };
@@ -90,6 +90,15 @@ public:
     std::unordered_map<StringObj*, Value> fields;
     explicit InstanceObj(ClassObj* klass):
         klass(klass) { };
+    std::string toString() override ;
+};
+
+class ClassMethodObj: public Object {
+public:
+    InstanceObj* receiver;
+    ClosureObj* method;
+    ClassMethodObj(InstanceObj* receiver, ClosureObj*  method):
+        receiver(receiver), method(method) { };
     std::string toString() override ;
 };
 

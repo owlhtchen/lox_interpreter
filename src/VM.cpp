@@ -2,6 +2,7 @@
 #include <VM.h>
 #include <DerivedObject.h>
 #include <iostream>
+#include <GarbageCollector.h>
 #include <debug.h>
 
 VM::VM() {
@@ -26,7 +27,7 @@ void VM::run() {
 
 void VM::start(FunctionObj *functionObj) {
     std::cout << " --- vm started ---" << std::endl;
-    auto closureObj = new ClosureObj(functionObj);
+    auto closureObj = GarbageCollector::getInstance().addObject(new ClosureObj(functionObj));
     stack.push_back(closureObj);
     createCallFrame(closureObj, 0);
     run();
