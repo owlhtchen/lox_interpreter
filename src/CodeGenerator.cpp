@@ -207,7 +207,12 @@ FunctionObj *CodeGenerator::endCurrentCompiler(int line) {
     // there might be a returnStmt in code and OP_RETURN is emitted, but emitting twice doesn't hurt
     // since the CallFrame will be popped when the first OP_RETURN is seen
     auto chunk = getCurrentChunk();
-    chunk->emitByte(static_cast<uint8_t>(OpCode::OP_NIL), line);
+    if(currentCompiler->functionType != CONSTRUCTOR_TYPE) {
+        chunk->emitByte(static_cast<uint8_t>(OpCode::OP_NIL), line);
+    } else {
+        Token _this = Token(TOKEN_THIS, "this", line);
+        getVariable(_this);
+    }
     chunk->emitByte(static_cast<uint8_t>(OpCode::OP_RETURN), line);
     currentCompiler->functionObj->closureCount = currentCompiler->upValues.size();
     auto tmp = currentCompiler->functionObj;
@@ -297,16 +302,23 @@ void CodeGenerator::visitCallExpr(const CallExpr &callExpr) {
 }
 
 void CodeGenerator::visitReturnStmt(const ReturnStmt &returnStmt) {
-    // TODO: check function type
     if(currentCompiler->functionType == SCRIPT_TYPE) {
         throw CompileError(returnStmt.getLastLine(), "'return' outside function");
     }
     auto chunk = getCurrentChunk();
     int line = returnStmt.getLastLine();
     if(returnStmt.returnExpr) {
+        if(currentCompiler->functionType == CONSTRUCTOR_TYPE) {
+            throw CompileError(line, "constructor cannot have a return value");
+        }
         compileExpr(*returnStmt.returnExpr);
     } else {
-        chunk->emitByte(static_cast<uint8_t>(OpCode::OP_NIL), line);
+        if(currentCompiler->functionType == CONSTRUCTOR_TYPE) {
+            Token _this = Token(TOKEN_THIS, "this", line);
+            getVariable(_this);
+        } else {
+            chunk->emitByte(static_cast<uint8_t>(OpCode::OP_NIL), line);
+        }
     }
     chunk->emitByte(static_cast<uint8_t>(OpCode::OP_RETURN), line);
 }
@@ -324,7 +336,11 @@ void CodeGenerator::visitClassStmt(const ClassStmt &classStmt) {
     // define methods of the class
     getVariable(classStmt.name);  // push classObj onto stack
     for(const auto & method: classStmt.methods) {
-        compileFunctionStmt(*method, METHOD_TYPE);
+        if(method->funcName.lexeme == "init") {
+            compileFunctionStmt(*method, CONSTRUCTOR_TYPE);
+        } else {
+            compileFunctionStmt(*method, METHOD_TYPE);
+        }
         StringObj* name = StringPool::getInstance().getStringObj(method->funcName.lexeme);
         int methodLine = method->getLastLine();
         auto methodName = chunk->addConstant(name, methodLine);

@@ -247,7 +247,9 @@ void CallFrame::runFrame() {
                 auto object = peekStackTop(0);
                 auto instanceObj = castToObj<InstanceObj>(&object);
                 if(instanceObj == nullptr) {
-                    throw RuntimeError(getCurrentLine(), "only instance can set field");
+                    std::cerr << "in : " << closureObj->toString() << std::endl;
+                    throw RuntimeError(getCurrentLine(), "only instance can set field, but "
+                                                         + toString(object) + " is not instance");
                 }
                 auto fieldName = readConstant();
                 auto field = castToObj<StringObj>(&fieldName);
@@ -291,12 +293,25 @@ void CallFrame::opCallValue(Value callee, int actualArity) {
         auto classObj = castToObj<ClassObj>(&callee);
         auto instanceObj = GarbageCollector::getInstance().addObject(new InstanceObj(classObj));
         vm.stack.indexFromEnd(actualArity) = instanceObj;  // replacing original callee (classObj)
+
+        // call init(...) if exists
+        StringObj* init = StringPool::getInstance().getStringObj("init");
+        auto initIter = classObj->methods.find(init);
+        if(initIter != classObj->methods.end()) {
+            vm.createCallFrame(initIter->second, actualArity);
+        } else {
+            if(actualArity != 0) {
+                throw RuntimeError(getCurrentLine(), "default constructor has no parameter, "
+                                                     "but you passed " + std::to_string(actualArity) + " arguments");
+            }
+        }
+
     } else if(isObj<ClassMethodObj>(&callee)) {
         auto classMethodObj = castToObj<ClassMethodObj>(&callee);
         vm.stack.indexFromEnd(actualArity) = classMethodObj->receiver; // GC can blacken receiver from vm.stack
         vm.createCallFrame(classMethodObj->method, actualArity);
     } else {
-        throw std::logic_error("unhandled callee in opCallValue");
+        throw std::logic_error("unhandled callee in opCallValue: " + toString(callee));
     }
 }
 

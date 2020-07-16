@@ -63,7 +63,7 @@ FunctionCompiler::FunctionCompiler(std::shared_ptr<FunctionCompiler> enclosing, 
         std::string funcName): enclosing(std::move(enclosing)), functionType(funcType) {
     currentScopeDepth = 0;
     functionObj = GarbageCollector::getInstance().addObject(new FunctionObj(std::move(funcName)));
-    if(functionType == METHOD_TYPE) {
+    if(functionType == METHOD_TYPE || funcType == CONSTRUCTOR_TYPE) {
         locals.emplace_back(Token("this"), 0);
     } else {
         locals.emplace_back(Token(""), 0);

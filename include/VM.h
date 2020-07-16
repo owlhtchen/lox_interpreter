@@ -29,7 +29,7 @@ private:
 public:
     // should take in a functionObj
     VM();
-    int createCallFrame(ClosureObj* callableObj, int stackBase);
+    int createCallFrame(ClosureObj* callableObj, int argCount);
     void start(FunctionObj* functionObj);
     void run();
 };

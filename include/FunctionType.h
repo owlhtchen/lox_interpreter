@@ -6,7 +6,8 @@
 enum FunctionType {
     FUNCTION_TYPE,
     METHOD_TYPE,
-    SCRIPT_TYPE
+    SCRIPT_TYPE,
+    CONSTRUCTOR_TYPE
 };
 
 
