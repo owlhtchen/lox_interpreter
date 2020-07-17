@@ -76,12 +76,15 @@ public:
 class ClassStmt: public Stmt {
 public:
     Token name;
+    bool hasSuperclass;
+    Token superclass;
     std::vector<std::unique_ptr<FunctionStmt>> methods;
     int lastLine;
     ClassStmt(Token name, std::vector<std::unique_ptr<FunctionStmt>> methods, int lastLine):
-        name(std::move(name)), methods(std::move(methods)), lastLine(lastLine) { };
+        name(std::move(name)), methods(std::move(methods)), lastLine(lastLine), hasSuperclass(false) { };
     void accept(VisitorStmt& visitor) const override ;
     int getLastLine() const override ;
+    void setSuperclass(Token superclass);
 };
 
 #endif //LOX_INTERPRETER_STMT_H

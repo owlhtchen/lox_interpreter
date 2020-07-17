@@ -354,6 +354,10 @@ void CodeGenerator::visitClassStmt(const ClassStmt &classStmt) {
 
     // define methods of the class
     getVariable(classStmt.name);  // push classObj onto stack
+    if(classStmt.hasSuperclass) {  // inherit methods from superclass
+        getVariable(classStmt.superclass);
+        chunk->emitOpCode(OpCode::OP_INHERIT, lastLine);
+    }
     for(const auto & method: classStmt.methods) {
         if(method->funcName.lexeme == "init") {
             compileFunctionStmt(*method, CONSTRUCTOR_TYPE);

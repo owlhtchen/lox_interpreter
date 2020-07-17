@@ -289,6 +289,21 @@ void CallFrame::runFrame() {
                     + object->toString() + "." + methodIter->second->toString());
                 break;
             }
+            case OpCode::OP_INHERIT: {
+                auto superclassValue = peekStackTop(0);
+                auto superclass = castToObj<ClassObj>(&superclassValue);
+                auto klassValue = peekStackTop(1);
+                auto klass = castToObj<ClassObj>(&klassValue);
+                if(superclass == nullptr || klass == nullptr) {
+                    throw RuntimeError(getCurrentLine(), toString(klassValue) +
+                    " cannot inherit from " + toString(superclassValue));
+                }
+                for(const auto & pair: superclass->methods) {
+                    klass->methods[pair.first] = pair.second;
+                }
+                popStack();
+                break;
+            }
             default: {
                 auto temp = static_cast<uint8_t >(currentOpcode);
                 throw std::logic_error("unhandled Opcode in CallFrame: " + std::to_string(temp));

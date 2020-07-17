@@ -195,14 +195,29 @@ std::unique_ptr<FunctionStmt> Parser::funcDecl() {
 
 std::unique_ptr<Stmt> Parser::classDecl() {
     Token name = tokens[current++];
+
+    // superclass
+    bool hasSuperclass = false;
+    Token superclass;
+    if(match(TOKEN_LESS)) {
+        hasSuperclass = true;
+        superclass = tokens[current++];
+    }
+
+    // methods
     std::vector<std::unique_ptr<FunctionStmt>> methods;
     consume(TOKEN_LEFT_BRACE, "{ expected for class declaration");
     while(!isAtEnd() && peek(0).type != TOKEN_RIGHT_BRACE) {
         methods.push_back(funcDecl());
     }
     consume(TOKEN_RIGHT_BRACE, "} expected for class declaration");
+
     int lastLine = methods.empty() ? 0 : methods.back()->getLastLine();
-    return std::make_unique<ClassStmt>(std::move(name), std::move(methods), lastLine);
+    auto newClass = std::make_unique<ClassStmt>(std::move(name), std::move(methods), lastLine);
+    if(hasSuperclass) {
+        newClass->setSuperclass(superclass);
+    }
+    return newClass;
 }
 
 std::unique_ptr<Stmt> Parser::declaration() {

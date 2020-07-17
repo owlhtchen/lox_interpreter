@@ -1,0 +1,37 @@
+print " ---------- 1 ----------------- ";
+class Doughnut {
+  cook() {
+    print "Dunk in the fryer.";
+  }
+}
+
+class Cruller < Doughnut {
+  finish() {
+    print "Glaze with icing";
+  }
+}
+
+var cruller = Cruller();
+cruller.cook();
+
+// print " ---------- 2 ----------------- ";
+// class A {
+//   method() {
+//     print "A method";
+//   }
+// }
+//
+// class B < A {
+//   method() {
+//     print "B method";
+//   }
+//   // local variable super = ClassObj A;
+//   test() {
+//     // capture super as closure variable
+//     super.method();
+//   }
+// }
+//
+// class C < B {}
+//
+// C().test();

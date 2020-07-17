@@ -37,11 +37,12 @@ typedef enum {
 
 class Token {
 
-    public: 
+public:
     TokenType type;
     std::string lexeme;
     int line;
 
+    Token() = default;
     explicit Token(std::string lexeme): lexeme(std::move(lexeme)), type(TOKEN_EMPTY), line(0) { };
     Token(TokenType type, std::string lexeme, int line): 
         type(type), lexeme(std::move(lexeme)), line(line) {}

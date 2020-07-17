@@ -3,6 +3,8 @@
 #include <VisitorStmt.h>
 #include <Expr.h>
 
+#include <utility>
+
 void ExprStmt::accept(VisitorStmt &visitor) const {
     visitor.visitExprStmt(*this);
 }
@@ -57,4 +59,9 @@ void ClassStmt::accept(VisitorStmt &visitor) const {
 
 int ClassStmt::getLastLine() const {
     return lastLine;
+}
+
+void ClassStmt::setSuperclass(Token _superclass) {
+    superclass = std::move(_superclass);
+    hasSuperclass = true;
 }
