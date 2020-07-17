@@ -14,7 +14,7 @@ void CallFrame::runFrame() {
     OpCode currentOpcode;
     Value second, first;
     auto& chunk = getCurrentChunk();
-    std::cerr << " in call frame of " << closureObj->toString() << std::endl;
+//    std::cerr << " in call frame of " << closureObj->toString() << " on line: " << getCurrentLine() << std::endl;
 
     while(ip < chunk.code.size()) {
         currentOpcode = readOpCode();
@@ -266,6 +266,18 @@ void CallFrame::runFrame() {
                 auto actualArity = readByte();
                 auto objectValue = peekStackTop(actualArity);
                 auto object = castToObj<InstanceObj>(&objectValue);
+                auto fieldIter = object->fields.find(methodName);
+                if(fieldIter != object->fields.end()) {
+                    auto fieldMethod = castToObj<ClosureObj>(&fieldIter->second);
+                    if(fieldMethod == nullptr) {
+                        throw RuntimeError(getCurrentLine(),
+                                toString(fieldIter->second) + " of " + object->toString() +
+                                " cannot be called as method");
+                    }
+                    opCallValue(fieldMethod, actualArity);
+                    return;
+                    break;
+                }
                 auto methodIter = object->klass->methods.find(methodName);
                 if(methodIter != object->klass->methods.end()) {
                     opCallValue(methodIter->second, actualArity);
@@ -363,7 +375,7 @@ Value CallFrame::readConstant() {
 }
 
 int CallFrame::getCurrentLine() {
-    return getCurrentChunk().lines[ip - 1];
+    return ip > 0 ? getCurrentChunk().lines[ip - 1] : 0;
 }
 
 Value CallFrame::popStack() {
