@@ -33,6 +33,9 @@ public:
     void emitOpCode(OpCode opCode, int line);
     void emitOpCodes(OpCode first, OpCode second, int line);
     void emitOpCodeByte(OpCode opCode, uint8_t operand, int line);
+    int emitJump(OpCode opCode, int line);
+    void patchJumpOffset(int startIp, uint16_t offset);
+    int getCodeSize();
 
 #ifdef LOX_DEBUG
     friend void disassembleChunk(Chunk* chunk);

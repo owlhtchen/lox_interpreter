@@ -247,15 +247,25 @@ std::unique_ptr<Stmt> Parser::statement() {
         auto expr = expression();
         consume(TOKEN_SEMICOLON, "expected ;");
         return std::make_unique<PrintStmt>(std::move(expr), tokens[current - 1].line);
-    } else if (match(TOKEN_LEFT_BRACE)) {
+    } else if (match(TOKEN_LEFT_BRACE)) {  // blockStmt
         return block(peek(-1).line);
-    } else if(match(TOKEN_RETURN)) {
+    } else if(match(TOKEN_RETURN)) { // returnStmt
         std::unique_ptr<Expr> returnExpr = nullptr;
         if(peek(0).type != TOKEN_SEMICOLON) {
             returnExpr = expression();
         }
         consume(TOKEN_SEMICOLON, "; expected after return statement");
         return std::make_unique<ReturnStmt>(peek(-1), std::move(returnExpr));
+    } else if (match(TOKEN_IF)) { // ifStmt
+        consume(TOKEN_LEFT_PAREN, "( expected after if");
+        auto condition = expression();
+        consume(TOKEN_RIGHT_PAREN, ") expected for if condition");
+        auto thenStmt = statement();
+        std::unique_ptr<Stmt> elseStmt = nullptr;
+        if(match(TOKEN_ELSE)) {
+            elseStmt = statement();
+        }
+        return std::make_unique<IfStmt>(std::move(condition), std::move(thenStmt), std::move(elseStmt));
     } else { // exprStmt;
         auto expr = expression();
         consume(TOKEN_SEMICOLON, "expected ;");

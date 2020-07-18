@@ -115,4 +115,13 @@ public:
     ~SuperExpr() override  = default;
 };
 
+//class LogicalExpr: public Expr {
+//public:
+//    std::unique_ptr<Expr> left;
+//    std::unique_ptr<Expr> right;
+//    Token opr;
+//    LogicalExpr(std::unique_ptr<Expr> left, std::unique_ptr<Expr> right, Token opr):
+//        left(std::move(left)), right(std::move(right)), opr(std::move(opr)) { };
+//};
+
 #endif //LOX_INTERPRETER_EXPR_H

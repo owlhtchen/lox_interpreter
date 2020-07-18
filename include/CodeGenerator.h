@@ -55,6 +55,8 @@ private:
     void compileFunctionStmt(const FunctionStmt & functionStmt, FunctionType functionType);  // closureObj compiled from functionStmt will be on stack top
     int compileArguments(const std::vector<std::unique_ptr<Expr>> & arguments);
     void compileSuperclassField(const std::string& superclassFieldName, OpCode opCode, int line);
+    void visitIfStmt(const IfStmt & stmt) override ;
+
 };
 
 #endif //LOX_INTERPRETER_CODEGENERATOR_H

@@ -10,6 +10,7 @@ class BlockStmt;
 class FunctionStmt;
 class ReturnStmt;
 class ClassStmt;
+class IfStmt;
 
 class VisitorStmt {
 public:
@@ -20,6 +21,7 @@ public:
     virtual void visitFunctionStmt(const FunctionStmt& stmt) = 0;
     virtual void visitReturnStmt(const ReturnStmt& stmt) = 0;
     virtual void visitClassStmt(const ClassStmt& stmt) = 0;
+    virtual void visitIfStmt(const IfStmt & stmt) = 0;
 };
 
 #endif //LOX_INTERPRETER_STMTEXPR_H

@@ -22,6 +22,12 @@ std::string toString(Value value) {
     }, value);
 }
 
+bool isFalse(Value* value) {
+auto tmpBool = std::get_if<bool>(value);
+auto tmpNil = std::get_if<std::monostate>(value);
+return (tmpNil != nullptr) || (tmpBool != nullptr && !*tmpBool);
+}
+
 //template <typename T>
 //T* castToObj(Value* value) {
 //    auto tmp = std::get_if<Object*>(value);

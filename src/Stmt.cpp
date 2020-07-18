@@ -65,3 +65,15 @@ void ClassStmt::setSuperclass(Token _superclass) {
     superclass = std::move(_superclass);
     hasSuperclass = true;
 }
+
+void IfStmt::accept(VisitorStmt & visitor) const {
+    visitor.visitIfStmt(*this);
+}
+
+int IfStmt::getLastLine() const {
+    if(elseStmt) {
+        return elseStmt->getLastLine();
+    } else {
+        return thenStmt->getLastLine();
+    }
+}

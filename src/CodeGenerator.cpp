@@ -429,3 +429,18 @@ void CodeGenerator::compileSuperclassField(const std::string& superclassFieldNam
     auto methodName = chunk->addConstant(method, line);
     chunk->emitOpCodeByte(opCode, methodName, line);
 }
+
+void CodeGenerator::visitIfStmt(const IfStmt &stmt) {
+    compileExpr(*stmt.condition);  // condition evaluates to true/false and it's on stack top
+    int condLine = stmt.condition->getLastLine();
+    int thenLine = stmt.thenStmt->getLastLine();
+    auto chunk = getCurrentChunk();
+    int toElse = chunk->emitJump(OpCode::OP_JUMP_IF_FALSE, condLine);
+    compileStmt(*stmt.thenStmt);
+    int toEnd = chunk->emitJump(OpCode::OP_JUMP, thenLine);
+    chunk->patchJumpOffset(toElse, chunk->getCodeSize() - (toElse + 2));
+    if(stmt.elseStmt) {
+        compileStmt(*stmt.elseStmt);
+    }
+    chunk->patchJumpOffset(toEnd, chunk->getCodeSize() - (toEnd + 2));
+}

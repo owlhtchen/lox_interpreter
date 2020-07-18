@@ -87,4 +87,16 @@ public:
     void setSuperclass(Token superclass);
 };
 
+class IfStmt: public Stmt {
+    // ifStmt → "if" "(" expression ")" statement ( "else" statement )? ;
+public:
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt> thenStmt;
+    std::unique_ptr<Stmt> elseStmt;
+    IfStmt(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> thenStmt, std::unique_ptr<Stmt> elseStmt):
+        condition(std::move(condition)), thenStmt(std::move(thenStmt)), elseStmt(std::move(elseStmt)) { };
+    void accept(VisitorStmt & visitor) const override ;
+    int getLastLine() const override ;
+};
+
 #endif //LOX_INTERPRETER_STMT_H

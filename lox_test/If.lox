@@ -1,0 +1,19 @@
+ fun returnFalse() {
+     return "hi" == "bye";
+ }
+
+ print " ------- 2 ------ ";
+ if(returnFalse()) {
+     print "if";
+ } else {
+     print "else";
+ }
+
+ print " ------- 1 ------ ";
+ if(3 + 10 > -2) {
+     print "if";
+ } else {
+     print "else";
+ }
+
+// print returnFalse();

@@ -24,4 +24,6 @@ bool isObj(Value* value) {
     return castToObj<T>(value) != nullptr;
 }
 
+bool isFalse(Value* value);
+
 #endif //LOX_INTERPRETER_VALUE_H

@@ -330,6 +330,20 @@ void CallFrame::runFrame() {
                 return;
                 break;
             }
+            case OpCode::OP_JUMP: {
+                int offset = readOffset();
+                ip += offset;
+                break;
+            }
+            case OpCode::OP_JUMP_IF_FALSE: {
+                int offset = readOffset();
+                Value condition = peekStackTop(0);
+                if(isFalse(&condition)) {
+                    ip += offset;
+                }
+                popStack();
+                break;
+            }
             default: {
                 auto temp = static_cast<uint8_t >(currentOpcode);
                 throw std::logic_error("unhandled Opcode in CallFrame: " + std::to_string(temp));
@@ -490,6 +504,14 @@ Value CallFrame::peekStackTop(int relativeIndex) {
 
 void CallFrame::setStackBase(int relativeIndex, const Value &newValue) {
     vm.stack[stackBase + relativeIndex] = newValue;
+}
+
+uint16_t CallFrame::readOffset() {
+    uint8_t high = readByte();
+    uint8_t low = readByte();
+    int offset = ((high << 8) | low);
+    return offset;
+
 }
 
 

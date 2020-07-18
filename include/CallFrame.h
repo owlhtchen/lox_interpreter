@@ -33,6 +33,7 @@ public:
     uint8_t readByte();
     OpCode readOpCode();
     Value readConstant();
+    uint16_t readOffset();
     int getCurrentLine();
     void pushStack(Value value);
     Value popStack();
