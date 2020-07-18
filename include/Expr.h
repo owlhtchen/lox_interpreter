@@ -104,4 +104,15 @@ public:
     ~SetExpr() override = default;
 };
 
+class SuperExpr: public Expr {
+public:
+    int line;
+    Token identifier;
+    SuperExpr(Token identifier, int line):
+        identifier(std::move(identifier)), line(line) { };
+    int getLastLine() const override ;
+    void accept (VisitorExpr& visitor) const override ;
+    ~SuperExpr() override  = default;
+};
+
 #endif //LOX_INTERPRETER_EXPR_H

@@ -124,6 +124,10 @@ std::unique_ptr<Expr> Parser::primary() {
         auto innerExpr = expression();
         consume(TOKEN_RIGHT_PAREN, "Missing )");
         return std::make_unique<GroupingExpr>(std::move(innerExpr));
+    } else if (match(TOKEN_SUPER)) {
+        consume(TOKEN_DOT, "expected . after super");
+        consume(TOKEN_IDENTIFIER, "expected identifier after super.");
+        return std::make_unique<SuperExpr>(peek(-1), peek(-2).line);
     }
 
     throw std::logic_error("primary nullptr in parser: with token "

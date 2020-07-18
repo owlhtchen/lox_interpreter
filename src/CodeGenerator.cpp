@@ -346,11 +346,20 @@ void CodeGenerator::visitClassStmt(const ClassStmt &classStmt) {
     // define class
     auto index = declareVariable(classStmt.name);
     int lastLine = classStmt.getLastLine();
+    int classNameLine = classStmt.name.line;
 
     auto chunk = getCurrentChunk();
     chunk->emitOpCodeByte(OpCode::OP_CLASS, index, classStmt.name.line);
 
     defineVariable(index, classStmt.getLastLine());
+
+    if(classStmt.hasSuperclass) {    // define super as local variable, super = superclass
+        currentCompiler->beginScope();
+        Token superToken(TOKEN_SUPER, "super", classNameLine);
+        auto superIndex = declareVariable(superToken);
+        getVariable(classStmt.superclass);
+        defineVariable(superIndex, classNameLine);
+    }
 
     // define methods of the class
     getVariable(classStmt.name);  // push classObj onto stack
@@ -370,6 +379,10 @@ void CodeGenerator::visitClassStmt(const ClassStmt &classStmt) {
         chunk->emitOpCodeByte(OpCode::OP_METHOD, methodName, methodLine);
     }
     chunk->emitOpCode(OpCode::OP_POP, lastLine); // pop classObj off stack
+
+    if(classStmt.hasSuperclass) {
+        currentCompiler->endScope(lastLine);
+    }
 }
 
 void CodeGenerator::visitGetExpr(const GetExpr &getExpr) {
@@ -392,4 +405,15 @@ void CodeGenerator::visitSetExpr(const SetExpr &setExpr) {
     StringObj* name = StringPool::getInstance().getStringObj(setExpr.field.lexeme);
     auto fieldName = chunk->addConstant(name, line);
     chunk->emitOpCodeByte(OpCode::OP_SET_PROPERTY, fieldName, line);
+}
+
+void CodeGenerator::visitSuperExpr(const SuperExpr & superExpr) {
+    int line = superExpr.line;
+    auto chunk = getCurrentChunk();
+    Token superToken(TOKEN_SUPER, "super", line);
+    getVariable(superToken);  // push superclass onto stack
+//    chunk->emitOpCode(OpCode::OP_VMSTACK_DEBUG, line);
+    StringObj* method = StringPool::getInstance().getStringObj(superExpr.identifier.lexeme);
+    auto methodName = chunk->addConstant(method, line);
+    chunk->emitOpCodeByte(OpCode::OP_GET_SUPER, methodName, line);
 }

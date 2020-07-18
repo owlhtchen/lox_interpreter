@@ -11,6 +11,7 @@ class AssignExpr;
 class CallExpr;
 class GetExpr;
 class SetExpr;
+class SuperExpr;
 
 class VisitorExpr {
 public:
@@ -22,6 +23,7 @@ public:
     virtual void visitCallExpr(const CallExpr& expr) = 0;
     virtual void visitGetExpr(const GetExpr& expr) = 0;
     virtual void visitSetExpr(const SetExpr& expr) = 0;
+    virtual void visitSuperExpr(const SuperExpr& expr) = 0;
 };
 
 #endif //LOX_INTERPRETER_VISITOREXPR_H

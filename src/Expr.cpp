@@ -81,3 +81,11 @@ void SetExpr::accept(VisitorExpr &visitor) const {
 int SetExpr::getLastLine() const {
     return field.line;
 }
+
+int SuperExpr::getLastLine() const {
+    return line;
+}
+
+void SuperExpr::accept(VisitorExpr &visitor) const {
+    visitor.visitSuperExpr(*this);
+}

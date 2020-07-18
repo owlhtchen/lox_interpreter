@@ -14,6 +14,7 @@ private:
 public:
     Local(Token token, int scopeDepth):
         token(std::move(token)), scopeDepth(scopeDepth), isCaptured(false) { };
+    Token getToken();
 };
 
 

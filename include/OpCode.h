@@ -94,8 +94,9 @@ enum struct OpCode:uint8_t {
     OP_INHERIT,
 //< Superclasses inherit-op
 //> Methods and Initializers method-op
-    OP_METHOD
+    OP_METHOD,
 //< Methods and Initializers method-op
+    OP_VMSTACK_DEBUG // only for debug purpose
 };
 //< op-enum
 //> chunk-struct

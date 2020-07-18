@@ -12,13 +12,13 @@ void FunctionCompiler::declareLocal(const Token &token) {
         return;
     }
     // check token.lexeme exists at currentScopeDepth or not, and add
-    for(int i = locals.size(); i >= 0; i--) {
+    for(int i = locals.size() - 1; i >= 0; i--) {
         if(locals[i].scopeDepth != -1 && locals[i].scopeDepth != currentScopeDepth) {
             // check done
             break;
         }
         if(locals[i].token.lexeme == token.lexeme) {
-            throw RuntimeError(token.line, "local variable already declared at " +
+            throw CompileError(token.line, "local variable " + token.lexeme + " already declared at " +
             std::to_string(locals[i].token.line));
         }
     }

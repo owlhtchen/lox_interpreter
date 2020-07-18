@@ -49,6 +49,7 @@ private:
     void visitClassStmt(const ClassStmt& classStmt) override ;
     void visitGetExpr(const GetExpr & getExpr) override ;
     void visitSetExpr(const SetExpr & setExpr) override ;
+    void visitSuperExpr(const SuperExpr & superExpr) override ;
     FunctionObj* endCurrentCompiler(int line);
     void getVariable(const Token& token);  // emit OpCode to push variable onto stack
     void compileFunctionStmt(const FunctionStmt & functionStmt, FunctionType functionType);  // closureObj compiled from functionStmt will be on stack top

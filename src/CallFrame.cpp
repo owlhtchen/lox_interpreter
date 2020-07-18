@@ -121,6 +121,7 @@ void CallFrame::runFrame() {
             }
             case OpCode::OP_CLOSE_UPVALUE: {
                 closeUpValue();
+                popStack();  // pop the closed local variable off stack!
                 break;
             }
             case OpCode::OP_PRINT: {
@@ -231,7 +232,8 @@ void CallFrame::runFrame() {
                     break;
                 }
 
-                throw RuntimeError(getCurrentLine(),  instanceObj->toString() + " has no field " + field->toString());
+                throw RuntimeError(getCurrentLine(),
+                        toString(object) + " has no field " + toString(fieldName));
                 break;
             }
             case OpCode::OP_SET_PROPERTY: {
@@ -285,8 +287,8 @@ void CallFrame::runFrame() {
                     break;
                 }
 
-                throw RuntimeError(getCurrentLine(), "cannot invoke "
-                    + object->toString() + "." + methodIter->second->toString());
+                throw RuntimeError(getCurrentLine(), "cannot invoke ["
+                    + toString(objectValue) + "]." + toString(nameValue));
                 break;
             }
             case OpCode::OP_INHERIT: {
@@ -302,6 +304,41 @@ void CallFrame::runFrame() {
                     klass->methods[pair.first] = pair.second;
                 }
                 popStack();
+                break;
+            }
+            case OpCode::OP_GET_SUPER: {
+                auto objectValue = peekStackBase(0);
+                auto object = castToObj<InstanceObj>(&objectValue);
+                if(object == nullptr) {
+                    throw RuntimeError(getCurrentLine(),
+                            "super can only be accessed within object method");
+                }
+                auto superclassValue = peekStackTop(0);
+                auto superclass = castToObj<ClassObj>(&superclassValue);
+                if(superclass == nullptr) {
+                    throw RuntimeError(getCurrentLine(), "superclass not found");
+                }
+                auto nameValue = readConstant();
+                auto methodName = castToObj<StringObj>(&nameValue);
+                auto methodIter = superclass->methods.find(methodName);
+                if(methodIter == superclass->methods.end()) {
+                    std::string temp = " ----" + superclass->toString() + ": " + "\n";
+                    for(auto & pair: superclass->methods) {
+                        temp += pair.first->toString() + ", " + pair.second->toString() + "\n";
+                    }
+                    temp += " ---- \n";
+                    throw RuntimeError(getCurrentLine(),
+                            temp + "method " + toString(nameValue) + " not found in superclass " + toString(superclassValue));
+                }
+                auto method = methodIter->second;
+                auto superMethod = GarbageCollector::getInstance().addObject(new ClassMethodObj(object, method));
+                popStack();
+                pushStack(superMethod);
+                break;
+            }
+            case OpCode::OP_VMSTACK_DEBUG: {
+                std::cerr << " @@@@ OP_VMSTACK_DEBUG" << std::endl;
+                vm.stack.printStack();
                 break;
             }
             default: {
