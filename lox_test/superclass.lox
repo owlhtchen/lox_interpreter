@@ -2,7 +2,7 @@
  class Doughnut {
    cook() {
      print "Dunk in the fryer.";
-     // this.finish("sprinkles");
+     this.finish("sprinkles");
    }
    finish(ingredient) {
      print "Finish with " + ingredient;
@@ -20,35 +20,35 @@
 
 print " ---------- 2 ----------------- ";
 class A {
-  method(test) {
+  method() {
     print "A method";
   }
 }
 class B < A {
-  method(test) {
+  method() {
     print "B method";
   }
   // local variable super = ClassObj A;
   test() {
     // capture super as closure variable
-    super.method("test");
+    super.method();
   }
 }
 class C < B {}
 C().test();
 
-//
-// print " ---------- 1 ----------------- ";
-// class A {
-//   method() {
-//     print "A";
-//   }
-// }
-// class B < A {
-//   method() {
-//     var closure = super.method;
-//     closure(); // Prints "A".
-//   }
-// }
-// var b = B();
-// b.method();
+
+ print " ---------- 1 ----------------- ";
+ class A {
+   method() {
+     print "A";
+   }
+ }
+ class B < A {
+   method() {
+     var closure = super.method;
+     closure(); // Prints "A".
+   }
+ }
+ var b = B();
+ b.method();
