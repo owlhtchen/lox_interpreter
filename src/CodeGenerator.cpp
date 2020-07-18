@@ -303,19 +303,28 @@ int CodeGenerator::compileArguments(const std::vector<std::unique_ptr<Expr>> & a
 void CodeGenerator::visitCallExpr(const CallExpr &callExpr) {
     int line = callExpr.getLastLine();
     auto chunk = getCurrentChunk();
-    auto ptr = callExpr.callee.get();
-    auto calleeGetExpr = dynamic_cast<GetExpr*>(ptr);
-    if(calleeGetExpr == nullptr) {
-        compileExpr(*callExpr.callee); // push callee (e.g. as closureObj in Value) onto stack
-        int actualArity = compileArguments(callExpr.arguments);
-        chunk->emitOpCodeByte(OpCode::OP_CALL, actualArity, line);
-    } else { // e.g. object.method(arguments)
+    auto getPtr = callExpr.callee.get();
+    auto calleeGetExpr = dynamic_cast<GetExpr*>(getPtr);
+    auto superPtr = callExpr.callee.get();
+    auto calleeSuperExpr = dynamic_cast<SuperExpr*>(superPtr);
+
+    if(calleeGetExpr != nullptr) { // [optimized] e.g. object.method(arguments)
         compileExpr(*calleeGetExpr->object);  // push object on stack
         StringObj* method = StringPool::getInstance().getStringObj(calleeGetExpr->field.lexeme);
         auto methodName = chunk->addConstant(method, line);
         int actualArity = compileArguments(callExpr.arguments); // push arguments on stack
         chunk->emitOpCodeByte(OpCode::OP_INVOKE, methodName, line);
         chunk->emitByte(actualArity, line);
+    } else if(calleeSuperExpr != nullptr) { // [optimized] e.g. super.superclassMethod(arguments)
+        Token superToken(TOKEN_THIS, "this", line);
+        getVariable(superToken);
+        int actualArity = compileArguments(callExpr.arguments); // push arguments on stack
+        compileSuperclassField(calleeSuperExpr->identifier.lexeme, OpCode::OP_SUPER_INVOKE, line);
+        chunk->emitByte(actualArity, line);
+    } else { // e.g. var func = object.method; func()
+            compileExpr(*callExpr.callee); // push callee (e.g. as closureObj in Value) onto stack
+            int actualArity = compileArguments(callExpr.arguments);
+            chunk->emitOpCodeByte(OpCode::OP_CALL, actualArity, line);
     }
 
 }
@@ -409,11 +418,14 @@ void CodeGenerator::visitSetExpr(const SetExpr &setExpr) {
 
 void CodeGenerator::visitSuperExpr(const SuperExpr & superExpr) {
     int line = superExpr.line;
+    compileSuperclassField(superExpr.identifier.lexeme, OpCode::OP_GET_SUPER, line);
+}
+
+void CodeGenerator::compileSuperclassField(const std::string& superclassFieldName, OpCode opCode, int line) {
     auto chunk = getCurrentChunk();
     Token superToken(TOKEN_SUPER, "super", line);
     getVariable(superToken);  // push superclass onto stack
-//    chunk->emitOpCode(OpCode::OP_VMSTACK_DEBUG, line);
-    StringObj* method = StringPool::getInstance().getStringObj(superExpr.identifier.lexeme);
+    StringObj* method = StringPool::getInstance().getStringObj(superclassFieldName);
     auto methodName = chunk->addConstant(method, line);
-    chunk->emitOpCodeByte(OpCode::OP_GET_SUPER, methodName, line);
+    chunk->emitOpCodeByte(opCode, methodName, line);
 }

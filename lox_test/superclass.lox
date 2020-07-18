@@ -1,54 +1,54 @@
-  print " ---------- 3 ----------------- ";
-  class Doughnut {
-    cook() {
-      print "Dunk in the fryer.";
-      this.finish("sprinkles");
-    }
+ print " ---------- 3 ----------------- ";
+ class Doughnut {
+   cook() {
+     print "Dunk in the fryer.";
+     // this.finish("sprinkles");
+   }
+   finish(ingredient) {
+     print "Finish with " + ingredient;
+   }
+ }
+ class Cruller < Doughnut {
+   finish(ingredient) {
+     // No sprinkles.
+     super.finish("icing");
+   }
+ }
+ var cruller = Cruller();
+ cruller.finish("unknown");
+ cruller.cook();
 
-    finish(ingredient) {
-      print "Finish with " + ingredient;
-    }
+print " ---------- 2 ----------------- ";
+class A {
+  method(test) {
+    print "A method";
   }
-  class Cruller < Doughnut {
-    finish(ingredient) {
-      // No sprinkles.
-      super.finish("icing");
-    }
+}
+class B < A {
+  method(test) {
+    print "B method";
   }
-  var cruller = Cruller();
-  cruller.finish("unknown");
-  cruller.cook();
+  // local variable super = ClassObj A;
+  test() {
+    // capture super as closure variable
+    super.method("test");
+  }
+}
+class C < B {}
+C().test();
 
- print " ---------- 2 ----------------- ";
- class A {
-   method() {
-     print "A method";
-   }
- }
- class B < A {
-   method() {
-     print "B method";
-   }
-   // local variable super = ClassObj A;
-   test() {
-     // capture super as closure variable
-     super.method();
-   }
- }
- class C < B {}
- C().test();
-
- print " ---------- 1 ----------------- ";
- class A {
-   method() {
-     print "A";
-   }
- }
- class B < A {
-   method() {
-     var closure = super.method;
-     closure(); // Prints "A".
-   }
- }
- var b = B();
- b.method();
+//
+// print " ---------- 1 ----------------- ";
+// class A {
+//   method() {
+//     print "A";
+//   }
+// }
+// class B < A {
+//   method() {
+//     var closure = super.method;
+//     closure(); // Prints "A".
+//   }
+// }
+// var b = B();
+// b.method();

@@ -307,38 +307,27 @@ void CallFrame::runFrame() {
                 break;
             }
             case OpCode::OP_GET_SUPER: {
-                auto objectValue = peekStackBase(0);
-                auto object = castToObj<InstanceObj>(&objectValue);
-                if(object == nullptr) {
-                    throw RuntimeError(getCurrentLine(),
-                            "super can only be accessed within object method");
-                }
-                auto superclassValue = peekStackTop(0);
-                auto superclass = castToObj<ClassObj>(&superclassValue);
-                if(superclass == nullptr) {
-                    throw RuntimeError(getCurrentLine(), "superclass not found");
-                }
-                auto nameValue = readConstant();
-                auto methodName = castToObj<StringObj>(&nameValue);
-                auto methodIter = superclass->methods.find(methodName);
-                if(methodIter == superclass->methods.end()) {
-                    std::string temp = " ----" + superclass->toString() + ": " + "\n";
-                    for(auto & pair: superclass->methods) {
-                        temp += pair.first->toString() + ", " + pair.second->toString() + "\n";
-                    }
-                    temp += " ---- \n";
-                    throw RuntimeError(getCurrentLine(),
-                            temp + "method " + toString(nameValue) + " not found in superclass " + toString(superclassValue));
-                }
-                auto method = methodIter->second;
+                InstanceObj* object;
+                ClosureObj* method;
+                getObjectSuperclassMethod(object, method);
                 auto superMethod = GarbageCollector::getInstance().addObject(new ClassMethodObj(object, method));
-                popStack();
+                popStack();  // pop superclass (ClassObj) off stack
                 pushStack(superMethod);
                 break;
             }
             case OpCode::OP_VMSTACK_DEBUG: {
-                std::cerr << " @@@@ OP_VMSTACK_DEBUG" << std::endl;
+                std::cerr << " ~~~ OP_VMSTACK_DEBUG ~~~" << std::endl;
                 vm.stack.printStack();
+                break;
+            }
+            case OpCode::OP_SUPER_INVOKE: {
+                InstanceObj* object;
+                ClosureObj* method;
+                getObjectSuperclassMethod(object, method);
+                popStack();  // pop superclass (ClassObj) off stack
+                int actualArity = readByte();
+                opCallValue(method, actualArity);
+                return;
                 break;
             }
             default: {
@@ -386,6 +375,34 @@ void CallFrame::opCallValue(Value callee, int actualArity) {
     } else {
         throw std::logic_error("unhandled callee in opCallValue: " + toString(callee));
     }
+}
+
+void CallFrame::getObjectSuperclassMethod(InstanceObj* & objectRet, ClosureObj* & closureObjRet) {
+    auto objectValue = peekStackBase(0);
+    auto object = castToObj<InstanceObj>(&objectValue);
+    if(object == nullptr) {
+        throw RuntimeError(getCurrentLine(),
+                           "super can only be accessed within object method");
+    }
+    auto superclassValue = peekStackTop(0);
+    auto superclass = castToObj<ClassObj>(&superclassValue);
+    if(superclass == nullptr) {
+        throw RuntimeError(getCurrentLine(), "superclass not found");
+    }
+    auto nameValue = readConstant();
+    auto methodName = castToObj<StringObj>(&nameValue);
+    auto methodIter = superclass->methods.find(methodName);
+    if(methodIter == superclass->methods.end()) {
+        std::string temp = " ----" + superclass->toString() + ": " + "\n";
+        for(auto & pair: superclass->methods) {
+            temp += pair.first->toString() + ", " + pair.second->toString() + "\n";
+        }
+        temp += " ---- \n";
+        throw RuntimeError(getCurrentLine(),
+                           temp + "method " + toString(nameValue) + " not found in superclass " + toString(superclassValue));
+    }
+    objectRet = object;
+    closureObjRet = methodIter->second;
 }
 
 void CallFrame::addUpValuesToClosure(ClosureObj* newClosure) {

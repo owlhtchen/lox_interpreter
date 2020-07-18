@@ -12,47 +12,47 @@ class Oops {
 var oops = Oops();
 oops.field();
 
-// print " -------------- 3 --------------------- ";
-// class Brunch {
-//   init(food, drink) {
-//        this.food = food;
-//        this.drink = drink;
-//        return;
-//   }
-// }
-// var brunch = Brunch("eggs", "coffee");
-// print brunch;
-// print brunch.food + " " + brunch.drink;
-//
-// print " -------------- 2 --------------------- ";
-// class Person {
-//   sayName() {
-//     print this.name;
-//   }
-//   sayFamily() {
-//     print this.family;
-//   }
-// }
-//
-// var jane = Person();
-// jane.name = "Jane";
-// jane.sayName();
-// jane.sayName();
-//
-// var method = jane.sayName;
-// method();
-// jane.name = "Changed";
-// jane.family = "Li";
-// print jane;
-// method();
-// jane.sayFamily();
+ print " -------------- 3 --------------------- ";
+ class Brunch {
+   init(food, drink) {
+        this.food = food;
+        this.drink = drink;
+        return;
+   }
+ }
+ var brunch = Brunch("eggs", "coffee");
+ print brunch;
+ print brunch.food + " " + brunch.drink;
 
-// print " -------------- 1 --------------------- ";
-// class Pair {}
-// print Pair;
-//
-// var pair = Pair();
-// print pair;
-// pair.first = 1;
-// pair.second = 2;
-// print pair.first + pair.second; // 3.
+ print " -------------- 2 --------------------- ";
+ class Person {
+   sayName() {
+     print this.name;
+   }
+   sayFamily() {
+     print this.family;
+   }
+ }
+
+ var jane = Person();
+ jane.name = "Jane";
+ jane.sayName();
+ jane.sayName();
+
+ var method = jane.sayName;
+ method();
+ jane.name = "Changed";
+ jane.family = "Li";
+ print jane;
+ method();
+ jane.sayFamily();
+
+ print " -------------- 1 --------------------- ";
+ class Pair {}
+ print Pair;
+
+ var pair = Pair();
+ print pair;
+ pair.first = 1;
+ pair.second = 2;
+ print pair.first + pair.second; // 3.

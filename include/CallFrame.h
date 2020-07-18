@@ -11,6 +11,7 @@
 class ClosureObj;
 class UpValueObj;
 class VM;
+class InstanceObj;
 
 class CallFrame {
     friend class VM;
@@ -43,6 +44,7 @@ public:
     void closeUpValues(Value* location);
     void opCallValue(Value callee, int actualArity);
     void addUpValuesToClosure(ClosureObj* closureObj);
+    void getObjectSuperclassMethod(InstanceObj* & objectRet, ClosureObj* & closureObjRet);
 };
 
 

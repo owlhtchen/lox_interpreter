@@ -54,6 +54,7 @@ private:
     void getVariable(const Token& token);  // emit OpCode to push variable onto stack
     void compileFunctionStmt(const FunctionStmt & functionStmt, FunctionType functionType);  // closureObj compiled from functionStmt will be on stack top
     int compileArguments(const std::vector<std::unique_ptr<Expr>> & arguments);
+    void compileSuperclassField(const std::string& superclassFieldName, OpCode opCode, int line);
 };
 
 #endif //LOX_INTERPRETER_CODEGENERATOR_H
