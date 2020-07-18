@@ -1,19 +1,42 @@
- fun returnFalse() {
-     return "hi" == "bye";
+ print " ------- 4 ------ ";
+ // 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144
+ fun fibonacci(n) {
+     if(n == 0) {
+         return 0;
+     } else {
+         if(n == 1) {
+             return 1;
+         } else {
+             return fibonacci(n - 1) + fibonacci(n - 2);
+         }
+     }
  }
+ // n = 17, 1597
+ print fibonacci(17);
 
- print " ------- 2 ------ ";
- if(returnFalse()) {
-     print "if";
- } else {
-     print "else";
- }
-
- print " ------- 1 ------ ";
- if(3 + 10 > -2) {
-     print "if";
- } else {
-     print "else";
- }
-
-// print returnFalse();
+// print " ------- 3 ------ ";
+// fun countDown(num) {
+//     if(num <= 0) {
+//         return;
+//     }
+//     print num;
+//     countDown(num - 1);
+// }
+// countDown(10);
+//
+//   print " ------- 2 ------ ";
+//  fun returnFalse() {
+//      return "hi" == "bye";
+//  }
+//  if(returnFalse()) {
+//      print "if";
+//  } else {
+//      print "else";
+//  }
+//
+//  print " ------- 1 ------ ";
+//  if(3 + 9 == 13) {
+//      print "if";
+//  } else {
+//      print "else";
+//  }

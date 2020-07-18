@@ -4,6 +4,7 @@
 
 #include <OpCode.h>
 #include <stdexcept>
+#include <cmath>
 
 inline double basic_arithmetic(OpCode opCode, double first, double second) {
     switch (opCode) {
@@ -23,7 +24,7 @@ inline double basic_arithmetic(OpCode opCode, double first, double second) {
 inline bool basic_boolean(OpCode opCode, double first, double second) {
     switch (opCode) {
         case OpCode::OP_EQUAL:
-            return first - second < 1e-5 || second - first < 1e-5;
+            return abs(first - second) < 1e-5;
         case OpCode::OP_GREATER:
             return first > second;
         case OpCode::OP_LESS:
