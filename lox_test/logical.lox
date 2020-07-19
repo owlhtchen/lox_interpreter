@@ -1,0 +1,31 @@
+print " ------------ 4 ------------ ";
+var i = 0;
+var j = 1000;
+while(i < 100 and j >= 20) {
+    print "i: " + i;
+    print "j: " + j;
+    i = i + 7;
+    j = j / 1.4;
+}
+print "after while: ";
+print "i: " + i;
+print "j: " + j;
+
+print " ------------ 3 ------------ ";
+// short circuit and
+var c = (10 == 0) and "hi";
+var d = (10 > 0) and 2;
+print c;
+print d;
+
+print " ------------ 2 ------------ ";
+// short circuit or
+print "hi" or 2; // "hi".
+print nil or "yes"; // "yes".
+
+// false and nil are falsey and everything else is truthy (like ruby)
+
+print " ------------ 1 ------------ ";
+print !"hi";
+var a;
+print !a;

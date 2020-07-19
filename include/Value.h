@@ -25,5 +25,6 @@ bool isObj(Value* value) {
 }
 
 bool isFalse(Value* value);
+bool isTrue(Value* value);
 
 #endif //LOX_INTERPRETER_VALUE_H

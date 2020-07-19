@@ -46,11 +46,12 @@ void CallFrame::runFrame() {
             }
             case OpCode::OP_NOT: {
                 first = popStack();
-                if (auto first_double = std::get_if<bool>(&first)) {
-                    pushStack(!*first_double);
-                } else {
-                    throw RuntimeError(getCurrentLine(), "not opr can only be used with a boolean value");
-                }
+                pushStack(!isTrue(&first));
+//                if (auto first_double = std::get_if<bool>(&first)) {
+//                    pushStack(!*first_double);
+//                } else {
+//                    throw RuntimeError(getCurrentLine(), "not opr can only be used with a boolean value");
+//                }
                 break;
             }
             case OpCode::OP_ADD:
@@ -339,7 +340,14 @@ void CallFrame::runFrame() {
                 if(isFalse(&condition)) {
                     ip += offset;
                 }
-                popStack();
+                break;
+            }
+            case OpCode::OP_JUMP_IF_TRUE: {
+                int offset = readOffset();
+                Value condition = peekStackTop(0);
+                if(isTrue(&condition)) {
+                    ip += offset;
+                }
                 break;
             }
             case OpCode::OP_LOOP: {

@@ -436,6 +436,7 @@ void CodeGenerator::visitIfStmt(const IfStmt &stmt) {
     int thenLine = stmt.thenStmt->getLastLine();
     auto chunk = getCurrentChunk();
     int toElse = chunk->emitJump(OpCode::OP_JUMP_IF_FALSE, condLine);
+    chunk->emitOpCode(OpCode::OP_POP, condLine);
     compileStmt(*stmt.thenStmt);
     int toEnd = chunk->emitJump(OpCode::OP_JUMP, thenLine);
     chunk->patchJumpOffset(toElse, chunk->getCodeSize() - (toElse + 2));
@@ -453,6 +454,7 @@ void CodeGenerator::visitWhileStmt(const WhileStmt& stmt) {
     currentCompiler->beginScope();
     compileExpr(*stmt.condition);
     int toEnd = chunk->emitJump(OpCode::OP_JUMP_IF_FALSE, condLine);
+    chunk->emitOpCode(OpCode::OP_POP, condLine);
     compileStmt(*stmt.body);
     int toStart = chunk->emitJump(OpCode::OP_LOOP, bodyLine);
     chunk->patchJumpOffset(toStart, toStart + 2 - whileStart);
@@ -472,6 +474,7 @@ void CodeGenerator::visitForStmt(const ForStmt &stmt) {
         compileExpr(*stmt.condition);
     }
     int toEnd = chunk->emitJump(OpCode::OP_JUMP_IF_FALSE, line);
+    chunk->emitOpCode(OpCode::OP_POP, line);
     compileStmt(*stmt.body);
     if(stmt.increment) {
         compileExpr(*stmt.increment);
@@ -480,4 +483,19 @@ void CodeGenerator::visitForStmt(const ForStmt &stmt) {
     chunk->patchJumpOffset(toStart, toStart + 2 - whileStart);
     chunk->patchJumpOffset(toEnd, chunk->getCodeSize() - (toEnd + 2));
     currentCompiler->endScope(line);
+}
+
+void CodeGenerator::visitLogicalExpr(const LogicalExpr &expr) {
+    auto chunk = getCurrentChunk();
+    int line = expr.getLastLine();
+    compileExpr(*expr.left);
+    int logicalLeft;
+    if(expr.opr.type == TOKEN_AND) { // and short circuit
+        logicalLeft = chunk->emitJump(OpCode::OP_JUMP_IF_FALSE, line);
+    } else { // or short circuit
+        logicalLeft = chunk->emitJump(OpCode::OP_JUMP_IF_TRUE, line);
+    }
+    chunk->emitOpCode(OpCode::OP_POP, line);
+    compileExpr(*expr.right);
+    chunk->patchJumpOffset(logicalLeft, chunk->getCodeSize() - (logicalLeft + 2));
 }

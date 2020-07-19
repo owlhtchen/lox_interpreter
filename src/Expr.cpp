@@ -89,3 +89,11 @@ int SuperExpr::getLastLine() const {
 void SuperExpr::accept(VisitorExpr &visitor) const {
     visitor.visitSuperExpr(*this);
 }
+
+int LogicalExpr::getLastLine() const {
+    return opr.line;
+}
+
+void LogicalExpr::accept(VisitorExpr &visitor) const {
+    visitor.visitLogicalExpr(*this);
+}

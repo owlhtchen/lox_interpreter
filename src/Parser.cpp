@@ -19,7 +19,7 @@ std::unique_ptr<Expr> Parser::expression() {
 
 std::unique_ptr<Expr> Parser::assignment() {
     // parse it as an normal expression, turn it into a AssignExpr/SetExpr if we see TOKEN_EQUAL
-    std::unique_ptr<Expr> expr = equality();
+    std::unique_ptr<Expr> expr = logical_or();
     if(match(TOKEN_EQUAL)) {
         auto asIdentifier = dynamic_cast<LiteralExpr*>(expr.get());
         if(asIdentifier != nullptr) {
@@ -34,6 +34,24 @@ std::unique_ptr<Expr> Parser::assignment() {
     } else {
         return expr;
     }
+}
+
+std::unique_ptr<Expr> Parser::logical_or() {
+    std::unique_ptr<Expr> expr = logical_and();
+    while(match(TOKEN_OR)) {
+        Token opr = peek(-1);
+        expr = std::make_unique<LogicalExpr>(std::move(expr), logical_and(), std::move(opr));
+    }
+    return expr;
+}
+
+std::unique_ptr<Expr> Parser::logical_and() {
+    std::unique_ptr<Expr> expr = equality();
+    while(match(TOKEN_AND)) {
+        Token opr = peek(-1);
+        expr = std::make_unique<LogicalExpr>(std::move(expr), equality(), std::move(opr));
+    }
+    return expr;
 }
 
 std::unique_ptr<Expr> Parser::equality() {

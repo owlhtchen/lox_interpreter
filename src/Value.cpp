@@ -23,9 +23,14 @@ std::string toString(Value value) {
 }
 
 bool isFalse(Value* value) {
+    // false and nil are falsey and everything else is truthy
 auto tmpBool = std::get_if<bool>(value);
 auto tmpNil = std::get_if<std::monostate>(value);
 return (tmpNil != nullptr) || (tmpBool != nullptr && !*tmpBool);
+}
+
+bool isTrue(Value* value) {
+    return !isFalse(value);
 }
 
 //template <typename T>

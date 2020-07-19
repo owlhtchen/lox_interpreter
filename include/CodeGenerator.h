@@ -58,6 +58,7 @@ private:
     void visitIfStmt(const IfStmt & stmt) override ;
     void visitWhileStmt(const WhileStmt& stmt) override ;
     void visitForStmt(const ForStmt& stmt) override ;
+    void visitLogicalExpr(const LogicalExpr& expr) override ;
 };
 
 #endif //LOX_INTERPRETER_CODEGENERATOR_H
