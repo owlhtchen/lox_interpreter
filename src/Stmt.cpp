@@ -85,3 +85,11 @@ void WhileStmt::accept(VisitorStmt &visitor) const {
 int WhileStmt::getLastLine() const {
     return body->getLastLine();
 }
+
+void ForStmt::accept(VisitorStmt &visitor) const {
+    visitor.visitForStmt(*this);
+}
+
+int ForStmt::getLastLine() const {
+    return body->getLastLine();
+}

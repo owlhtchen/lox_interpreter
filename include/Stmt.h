@@ -109,4 +109,21 @@ public:
     int getLastLine() const override ;
 };
 
+class ForStmt: public Stmt {
+//    forStmt → "for" "(" ( varDecl | exprStmt | ";" )
+//    expression? ";"
+//    expression? ")" statement ;
+public:
+    std::unique_ptr<Stmt> initializer;
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Expr> increment;
+    std::unique_ptr<Stmt> body;
+    ForStmt(std::unique_ptr<Stmt> initializer, std::unique_ptr<Expr> condition,
+            std::unique_ptr<Expr>increment, std::unique_ptr<Stmt>body) :
+            initializer(std::move(initializer)), condition(std::move(condition)),
+            increment(std::move(increment)), body(std::move(body)) { };
+    void accept(VisitorStmt & visitor) const override ;
+    int getLastLine() const override ;
+};
+
 #endif //LOX_INTERPRETER_STMT_H

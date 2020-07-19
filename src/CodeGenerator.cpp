@@ -450,10 +450,34 @@ void CodeGenerator::visitWhileStmt(const WhileStmt& stmt) {
     int condLine = stmt.condition->getLastLine();
     int bodyLine = stmt.body->getLastLine();
     int whileStart = chunk->getCodeSize();
+    currentCompiler->beginScope();
     compileExpr(*stmt.condition);
     int toEnd = chunk->emitJump(OpCode::OP_JUMP_IF_FALSE, condLine);
     compileStmt(*stmt.body);
     int toStart = chunk->emitJump(OpCode::OP_LOOP, bodyLine);
     chunk->patchJumpOffset(toStart, toStart + 2 - whileStart);
     chunk->patchJumpOffset(toEnd, chunk->getCodeSize() - (toEnd + 2));
+    currentCompiler->endScope(bodyLine);
+}
+
+void CodeGenerator::visitForStmt(const ForStmt &stmt) {
+    int line = stmt.getLastLine();
+    auto chunk = getCurrentChunk();
+    currentCompiler->beginScope();
+    if(stmt.initializer) {
+        compileStmt(*stmt.initializer);
+    }
+    int whileStart = chunk->getCodeSize();
+    if(stmt.condition) {
+        compileExpr(*stmt.condition);
+    }
+    int toEnd = chunk->emitJump(OpCode::OP_JUMP_IF_FALSE, line);
+    compileStmt(*stmt.body);
+    if(stmt.increment) {
+        compileExpr(*stmt.increment);
+    }
+    int toStart = chunk->emitJump(OpCode::OP_LOOP, line);
+    chunk->patchJumpOffset(toStart, toStart + 2 - whileStart);
+    chunk->patchJumpOffset(toEnd, chunk->getCodeSize() - (toEnd + 2));
+    currentCompiler->endScope(line);
 }

@@ -272,6 +272,25 @@ std::unique_ptr<Stmt> Parser::statement() {
         consume(TOKEN_RIGHT_PAREN, ") expected for while condition");
         auto body = statement();
         return std::make_unique<WhileStmt>(std::move(condition), std::move(body));
+    } else if(match(TOKEN_FOR)) {  // forStmt
+        consume(TOKEN_LEFT_PAREN, "( expected after for");
+        std::unique_ptr<Stmt> initializer = nullptr;
+        if(!match(TOKEN_SEMICOLON)) {
+            initializer = declaration(); // exprStmt / varDecl
+        }
+        std::unique_ptr<Expr> condition = nullptr;
+        if(peek(0).type != TOKEN_SEMICOLON) {
+            condition = expression();
+        }
+        consume(TOKEN_SEMICOLON, "; expected after for condition");
+        std::unique_ptr<Expr> increment = nullptr;
+        if(peek(0).type != TOKEN_RIGHT_PAREN) {
+            increment = expression();
+        }
+        consume(TOKEN_RIGHT_PAREN, ") expected in for condition");
+        std::unique_ptr<Stmt> body = statement();
+        return std::make_unique<ForStmt>(std::move(initializer), std::move(condition),
+                std::move(increment), std::move(body));
     } else { // exprStmt;
         auto expr = expression();
         consume(TOKEN_SEMICOLON, "expected ;");

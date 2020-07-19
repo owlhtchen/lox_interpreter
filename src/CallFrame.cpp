@@ -146,6 +146,10 @@ void CallFrame::runFrame() {
             }
             case OpCode::OP_GET_GLOBAL: {
                 StringObj* varName = std::get<Object*>(readConstant())->cast<StringObj>();
+                auto iter = vm.globals.find(varName);
+                if(iter == vm.globals.end()) {
+                    throw RuntimeError(getCurrentLine(), "variable " + varName->toString() + " is not declared");
+                }
                 pushStack(vm.globals[varName]);
                 break;
             }

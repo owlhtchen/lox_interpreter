@@ -12,6 +12,7 @@ class ReturnStmt;
 class ClassStmt;
 class IfStmt;
 class WhileStmt;
+class ForStmt;
 
 class VisitorStmt {
 public:
@@ -24,6 +25,7 @@ public:
     virtual void visitClassStmt(const ClassStmt& stmt) = 0;
     virtual void visitIfStmt(const IfStmt & stmt) = 0;
     virtual void visitWhileStmt(const WhileStmt& stmt) = 0;
+    virtual void visitForStmt(const ForStmt& stmt) = 0;
 };
 
 #endif //LOX_INTERPRETER_STMTEXPR_H

@@ -57,6 +57,7 @@ private:
     void compileSuperclassField(const std::string& superclassFieldName, OpCode opCode, int line);
     void visitIfStmt(const IfStmt & stmt) override ;
     void visitWhileStmt(const WhileStmt& stmt) override ;
+    void visitForStmt(const ForStmt& stmt) override ;
 };
 
 #endif //LOX_INTERPRETER_CODEGENERATOR_H
