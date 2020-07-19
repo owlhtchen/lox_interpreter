@@ -7,6 +7,8 @@
 #include <OpCode.h>
 #include <vector>
 #include "VM.h"
+#include "GarbageCollector.h"
+
 
 class ClosureObj;
 class UpValueObj;

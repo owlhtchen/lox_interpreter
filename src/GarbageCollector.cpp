@@ -45,3 +45,6 @@ UpValueObj *GarbageCollector::addUpValue(Value *location) {
     }
 }
 
+void GarbageCollector::setVM(VM *_vm) {
+    vm = _vm;
+}

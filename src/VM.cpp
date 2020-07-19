@@ -3,9 +3,11 @@
 #include <DerivedObject.h>
 #include <iostream>
 #include <GarbageCollector.h>
+#include <GarbageCollector.h>
 #include <debug.h>
 
 VM::VM() {
+    GarbageCollector::getInstance().setVM(this);
 #ifdef VECTOR
     stack.reserve(10000);
 #endif

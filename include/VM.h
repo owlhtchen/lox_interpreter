@@ -12,9 +12,11 @@
 
 class Object;
 class FunctionObj;
+class GarbageCollector;
 
 class VM {
     friend class CallFrame;
+    friend class GarbageCollector;
 private:
 //    Chunk chunk;
 //    int ip;

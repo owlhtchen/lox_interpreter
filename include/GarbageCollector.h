@@ -4,14 +4,18 @@
 // https://stackoverflow.com/questions/86582/singleton-how-should-it-be-used
 
 #include <DerivedObject.h>
+class CallFrame;
+class VM;
 
 class GarbageCollector {
+    friend class CallFrame;
 private:
     Object* allObjects;
     // private constructor
-    GarbageCollector(): allObjects(nullptr) {};
-public:
+    GarbageCollector(): allObjects(nullptr), allOpenUpValues(nullptr), vm(nullptr) {};
     UpValueObj* allOpenUpValues;  // sorted by UpValueObj.location
+    VM* vm;
+public:
     // prevent compiler from generating copy & assignment methods
     GarbageCollector(GarbageCollector const& copy) = delete;
     GarbageCollector& operator= (GarbageCollector const& copy) = delete;
@@ -20,6 +24,7 @@ public:
     T* addObject(T* _object);
     void freeAllObjects();
     UpValueObj* addUpValue(Value* location);
+    void setVM(VM* _vm);
 };
 
 template <typename T>
