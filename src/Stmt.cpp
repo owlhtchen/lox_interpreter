@@ -77,3 +77,11 @@ int IfStmt::getLastLine() const {
         return thenStmt->getLastLine();
     }
 }
+
+void WhileStmt::accept(VisitorStmt &visitor) const {
+    visitor.visitWhileStmt(*this);
+}
+
+int WhileStmt::getLastLine() const {
+    return body->getLastLine();
+}

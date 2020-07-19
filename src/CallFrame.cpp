@@ -64,17 +64,11 @@ void CallFrame::runFrame() {
                 if(second_double && first_double) {
                     pushStack(basic_arithmetic(currentOpcode, *first_double, *second_double));
                 } else if(currentOpcode == OpCode::OP_ADD) {
-                    Object* second_obj = *std::get_if<Object*>(&second);
-                    Object* first_obj = *std::get_if<Object*>(&first);
-                    if(second_obj && first_obj) {
-                        auto second_str = second_obj->dyn_cast<StringObj>();
-                        auto first_str = first_obj->dyn_cast<StringObj>();
-                        std::string new_str = first_str->str + second_str->str;
-                        pushStack(StringPool::getInstance().getStringObj(new_str));
-//                        stack.push_back(first_obj->str + second_obj->str);
-                    }
+                    std::string new_str;
+                    new_str = toString(first) + toString(second);
+                    pushStack(StringPool::getInstance().getStringObj(new_str));
                 } else {
-                    throw RuntimeError(getCurrentLine(), "+ - * / opr only support number or string (for add)");
+                    throw RuntimeError(getCurrentLine(), "- * / opr only support number or string");
                 }
                 break;
             }
@@ -342,6 +336,11 @@ void CallFrame::runFrame() {
                     ip += offset;
                 }
                 popStack();
+                break;
+            }
+            case OpCode::OP_LOOP: {
+                int offset = readOffset();
+                ip -= offset;
                 break;
             }
             default: {

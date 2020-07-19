@@ -266,6 +266,12 @@ std::unique_ptr<Stmt> Parser::statement() {
             elseStmt = statement();
         }
         return std::make_unique<IfStmt>(std::move(condition), std::move(thenStmt), std::move(elseStmt));
+    } else if (match(TOKEN_WHILE)) {  // whileStmt
+        consume(TOKEN_LEFT_PAREN, "( expected after while");
+        auto condition = expression();
+        consume(TOKEN_RIGHT_PAREN, ") expected for while condition");
+        auto body = statement();
+        return std::make_unique<WhileStmt>(std::move(condition), std::move(body));
     } else { // exprStmt;
         auto expr = expression();
         consume(TOKEN_SEMICOLON, "expected ;");

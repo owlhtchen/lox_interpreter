@@ -4,6 +4,7 @@
      if(n == 0) {
          return 0;
      } else {
+         // nest if-else
          if(n == 1) {
              return 1;
          } else {
@@ -14,29 +15,29 @@
  // n = 17, 1597
  print fibonacci(17);
 
-// print " ------- 3 ------ ";
-// fun countDown(num) {
-//     if(num <= 0) {
-//         return;
-//     }
-//     print num;
-//     countDown(num - 1);
-// }
-// countDown(10);
-//
-//   print " ------- 2 ------ ";
-//  fun returnFalse() {
-//      return "hi" == "bye";
-//  }
-//  if(returnFalse()) {
-//      print "if";
-//  } else {
-//      print "else";
-//  }
-//
-//  print " ------- 1 ------ ";
-//  if(3 + 9 == 13) {
-//      print "if";
-//  } else {
-//      print "else";
-//  }
+ print " ------- 3 ------ ";
+ fun countDown(num) {
+     if(num <= 0) {
+         return;
+     }
+     print num;
+     countDown(num - 1);
+ }
+ countDown(10);
+
+   print " ------- 2 ------ ";
+  fun returnTrue() {
+      return "bye" == "bye";
+  }
+  if(returnTrue()) {
+      print "if";
+  } else {
+      print "else";
+  }
+
+  print " ------- 1 ------ ";
+  if(3 + 9 == 13) {
+      print "if";
+  } else {
+      print "else";
+  }

@@ -99,4 +99,14 @@ public:
     int getLastLine() const override ;
 };
 
+class WhileStmt: public Stmt {
+public:
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt> body;
+    WhileStmt(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body):
+        condition(std::move(condition)), body(std::move(body)) { };
+    void accept(VisitorStmt & visitor) const override ;
+    int getLastLine() const override ;
+};
+
 #endif //LOX_INTERPRETER_STMT_H

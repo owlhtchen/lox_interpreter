@@ -444,3 +444,16 @@ void CodeGenerator::visitIfStmt(const IfStmt &stmt) {
     }
     chunk->patchJumpOffset(toEnd, chunk->getCodeSize() - (toEnd + 2));
 }
+
+void CodeGenerator::visitWhileStmt(const WhileStmt& stmt) {
+    auto chunk = getCurrentChunk();
+    int condLine = stmt.condition->getLastLine();
+    int bodyLine = stmt.body->getLastLine();
+    int whileStart = chunk->getCodeSize();
+    compileExpr(*stmt.condition);
+    int toEnd = chunk->emitJump(OpCode::OP_JUMP_IF_FALSE, condLine);
+    compileStmt(*stmt.body);
+    int toStart = chunk->emitJump(OpCode::OP_LOOP, bodyLine);
+    chunk->patchJumpOffset(toStart, toStart + 2 - whileStart);
+    chunk->patchJumpOffset(toEnd, chunk->getCodeSize() - (toEnd + 2));
+}
