@@ -1,12 +1,12 @@
-// {
-//     fun hello() { // fun hello is still stored as constant, operand for OP_CLOSURE
-//         print "hello";
-//     }
-//     hello();
-// }
-// var a = "first value";  // but "first value" is still in constants, still being marked?
-// a = "updated";
-// print a;
+{
+    fun hello() { // fun hello is still stored as constant, operand for OP_CLOSURE
+        print "hello";
+    }
+    hello();
+}
+var a = "first value";  // but "first value" is still in constants, still being marked?
+a = "updated";
+print a;
 
  print " ----------------- 1 -------------------";
  var i = 0;
