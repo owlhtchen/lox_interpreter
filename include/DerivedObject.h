@@ -24,6 +24,7 @@ private:
 public:
     explicit StringObj(std::string str): str(std::move(str)) {};
     std::string toString() override ;
+    void mark() override ;
 };
 
 class StringPool {
@@ -35,6 +36,7 @@ public:
     StringPool& operator= (StringPool const & copy) = delete;
     static StringPool& getInstance();
     StringObj* getStringObj(const std::string& str);  // non-static
+    void deleteString();
 };
 
 class FunctionObj;
@@ -55,6 +57,8 @@ public:
     std::string toString() override ;
     int getArity() { return arity; }
     std::string getName() { return name; }
+    void mark() override ;
+    ~FunctionObj() override ;
 };
 
 class UpValueObj: public Object {
@@ -65,6 +69,8 @@ public:
     UpValueObj(Value * location):
         location(location), closed(std::monostate()), next(nullptr) { };
     std::string toString() override ;
+    void mark() override ;
+    ~UpValueObj() override ;
 };
 
 class ClosureObj: public Object {
@@ -74,6 +80,8 @@ public:
     std::vector<UpValueObj*> upValues;
     explicit ClosureObj(FunctionObj* functionObj);
     std::string toString() override ;
+    void mark() override ;
+    ~ClosureObj() override ;
 };
 
 class ClassObj: public Object {
@@ -82,6 +90,8 @@ public:
     std::unordered_map<StringObj*, ClosureObj*> methods;
     explicit ClassObj(StringObj* name): name(name) { };
     std::string toString() override;
+    void mark() override ;
+    ~ClassObj() override ;
 };
 
 class InstanceObj: public Object {
@@ -91,6 +101,8 @@ public:
     explicit InstanceObj(ClassObj* klass):
         klass(klass) { };
     std::string toString() override ;
+    void mark() override ;
+    ~InstanceObj() override ;
 };
 
 class ClassMethodObj: public Object {
@@ -100,6 +112,8 @@ public:
     ClassMethodObj(InstanceObj* receiver, ClosureObj*  method):
         receiver(receiver), method(method) { };
     std::string toString() override ;
+    void mark() override ;
+    ~ClassMethodObj() override ;
 };
 
 #endif //LOX_INTERPRETER_DERIVEDOBJECT_H

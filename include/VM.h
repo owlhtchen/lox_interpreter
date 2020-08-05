@@ -34,6 +34,9 @@ public:
     int createCallFrame(ClosureObj* callableObj, int argCount);
     void start(FunctionObj* functionObj);
     void run();
+    void markStack();
+    void markCallFrames();
+    void markGlobals();
 };
 
 

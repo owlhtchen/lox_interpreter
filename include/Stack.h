@@ -69,11 +69,11 @@ T &Stack<T, N>::indexFromEnd(int endIndex) {
 
 template<typename T, int N>
 void Stack<T, N>::printStack() {
-    std::cerr << "printStack(): ";
+    std::cout << "printStack(): ";
     for(int i = 0; i < top; i++) {
-        std:: cerr << toString(_stack[i]) << ", ";
+        std:: cout << toString(_stack[i]) << ", ";
     }
-    std::cerr << std::endl;
+    std::cout << std::endl;
 }
 
 

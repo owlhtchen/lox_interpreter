@@ -27,4 +27,7 @@ bool isObj(Value* value) {
 bool isFalse(Value* value);
 bool isTrue(Value* value);
 
+void markValue(Value* value);
+void freeValue(Value* value);
+
 #endif //LOX_INTERPRETER_VALUE_H

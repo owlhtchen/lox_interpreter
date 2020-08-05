@@ -34,3 +34,31 @@ void VM::start(FunctionObj *functionObj) {
     createCallFrame(closureObj, 0);
     run();
 }
+
+void VM::markStack() {
+#ifdef GC_DEBUG_PRINT
+    std::cout << "markStack\n";
+#endif
+    for(int i = 0; i < stack.size(); i++) {
+        markValue(&stack[i]);
+    }
+}
+
+void VM::markCallFrames() {
+#ifdef GC_DEBUG_PRINT
+    std::cout << "markCallFrames\n";
+#endif
+    for(auto& callFrame: callFrames) {
+        callFrame.markCallFrame();
+    }
+}
+
+void VM::markGlobals() {
+#ifdef GC_DEBUG_PRINT
+    std::cout << "markGlobals\n";
+#endif
+    for(auto& it: globals) {
+        it.first->mark();
+        markValue(&it.second);
+    }
+}

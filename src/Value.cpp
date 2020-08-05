@@ -41,3 +41,17 @@ bool isTrue(Value* value) {
 //    }
 //    return (*tmp)->dyn_cast<T>();
 //}
+
+void markValue(Value* value) {
+    if(isObj<Object>(value)) {
+        auto valueObj = std::get_if<Object*>(value);
+        (*valueObj)->mark();
+    }
+}
+
+void freeValue(Value* value) {
+    if(isObj<Object>(value)) {
+        auto valueObj = std::get_if<Object*>(value);
+        free(*valueObj);
+    }
+}

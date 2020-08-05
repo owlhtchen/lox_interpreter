@@ -84,3 +84,21 @@ void Chunk::patchJumpOffset(int startIp, uint16_t offset) {
 int Chunk::getCodeSize() {
     return code.size();
 }
+
+void Chunk::markConstants() {
+    for(auto & constant: constants) {
+        if(isObj<Object>(&constant)) {
+            auto constantObj = std::get_if<Object*>(&constant);
+            (*constantObj)->mark();
+        }
+    }
+}
+
+void Chunk::freeConstantObjs() {
+    for(auto & constant: constants) {
+        if(isObj<Object>(&constant)) {
+            auto constantObj = std::get_if<Object*>(&constant);
+            free(*constantObj);
+        }
+    }
+}

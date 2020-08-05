@@ -360,6 +360,7 @@ void CallFrame::runFrame() {
                 throw std::logic_error("unhandled Opcode in CallFrame: " + std::to_string(temp));
             }
         }
+        GarbageCollector::getInstance().markSweep();
     }
 }
 
@@ -525,4 +526,7 @@ uint16_t CallFrame::readOffset() {
 
 }
 
+void CallFrame::markCallFrame() {
+    closureObj->mark();
+}
 

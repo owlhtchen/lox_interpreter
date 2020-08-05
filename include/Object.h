@@ -15,7 +15,6 @@ class Object {
     friend class GarbageCollector;
 private:
     Object* next;
-    bool isMarked;
     // isMarked should be set to true during initialization to prevent the GC from cleaning
     // the newly created object, and set back to false (after gc has done its work)
     // to prepare for next 'mark-sweep'
@@ -39,6 +38,9 @@ public:
         return dynamic_cast<T*>(this);
     }
     virtual std::string toString() = 0;
+    virtual void mark();
+
+    bool isMarked;
 };
 
 #endif //LOX_INTERPRETER_OBJECT_H

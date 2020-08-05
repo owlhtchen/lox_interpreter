@@ -25,6 +25,11 @@ public:
     void freeAllObjects();
     UpValueObj* addUpValue(Value* location);
     void setVM(VM* _vm);
+    void printAllObjects();
+    void markObjects();
+    void sweepObjects();
+    void markSweep();
+    void markOpenUpValues();
 };
 
 template <typename T>

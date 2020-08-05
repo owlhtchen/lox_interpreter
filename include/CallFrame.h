@@ -8,6 +8,7 @@
 #include <vector>
 #include "VM.h"
 #include "GarbageCollector.h"
+#include "DerivedObject.h"
 
 
 class ClosureObj;
@@ -48,6 +49,7 @@ public:
     void opCallValue(Value callee, int actualArity);
     void addUpValuesToClosure(ClosureObj* closureObj);
     void getObjectSuperclassMethod(InstanceObj* & objectRet, ClosureObj* & closureObjRet);
+    void markCallFrame();
 };
 
 

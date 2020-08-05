@@ -1,6 +1,8 @@
 
 #include <GarbageCollector.h>
 #include <DerivedObject.h>
+#include <iostream>
+#include <VM.h>
 
 GarbageCollector &GarbageCollector::getInstance() {
     // the only instance
@@ -47,4 +49,67 @@ UpValueObj *GarbageCollector::addUpValue(Value *location) {
 
 void GarbageCollector::setVM(VM *_vm) {
     vm = _vm;
+}
+
+void GarbageCollector::printAllObjects() {
+    auto temp = allObjects;
+    while (temp != nullptr) {
+        std::cout << temp->toString() << ": " << temp->isMarked << "; ";
+        temp = temp->next;
+    }
+    std::cout << std::endl;
+}
+
+void GarbageCollector::sweepObjects() {
+    if(!vm) {
+        return;
+    }
+    auto current = allObjects;
+    Object* prev = nullptr;
+    while (current != nullptr) {
+        if(!current->isMarked) {
+#ifdef GC_DEBUG_PRINT
+            std::cout << "- deleted: " << current->toString() << "; ";
+#endif
+            auto temp = current;
+            if(prev) {
+                prev->next = current->next;
+            } else {
+                allObjects = current->next;
+            }
+            current = current->next;
+            free(temp);
+        } else {
+            current->isMarked = false;
+            prev = current;
+            current = current->next;
+        }
+    }
+#ifdef GC_DEBUG_PRINT
+    std::cout << std::endl;
+#endif
+}
+
+void GarbageCollector::markObjects() {
+    if(!vm) {
+        return;
+    }
+    vm->markStack();
+    vm->markCallFrames();
+    vm->markGlobals();
+    markOpenUpValues();
+}
+
+void GarbageCollector::markSweep() {
+    markObjects();
+    StringPool::getInstance().deleteString();
+    sweepObjects();
+}
+
+void GarbageCollector::markOpenUpValues() {
+    auto temp = allOpenUpValues;
+    while (temp != nullptr) {
+        temp->mark();
+        temp = temp->next;
+    }
 }
