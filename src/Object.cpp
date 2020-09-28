@@ -6,7 +6,7 @@
 
 Object::Object(): isMarked(true), next(nullptr) {
     // https://www.learncpp.com/cpp-tutorial/114-constructors-and-initialization-of-derived-classes/
-    // TODO: call gc if necessary
+    // TODO: call gc if necessary (decided to call it in GarbageCollector::addObject after the object is fully constructed so I can call object.mark() )
 
 //    GarbageCollector::getInstance().markSweep();
 

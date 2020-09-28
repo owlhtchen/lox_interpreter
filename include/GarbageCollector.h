@@ -4,6 +4,7 @@
 // https://stackoverflow.com/questions/86582/singleton-how-should-it-be-used
 
 #include <DerivedObject.h>
+#include <debug.h>
 class CallFrame;
 class VM;
 
@@ -35,6 +36,11 @@ public:
 template <typename T>
 T* GarbageCollector::addObject(T * _object) {
     auto* object = (Object* ) _object;
+#ifndef CAll_GC_EVERY
+    // TODO: (note) current GC runs every time it addObject
+      object->mark();
+     GarbageCollector::getInstance().markSweep();
+#endif
     auto& gc = GarbageCollector::getInstance();
     object->next = gc.allObjects;
     gc.allObjects = object;

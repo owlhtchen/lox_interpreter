@@ -2,6 +2,7 @@
 #include <GarbageCollector.h>
 #include <variant>
 #include <Value.h>
+#include <iostream>
 
 
 StringPool &StringPool::getInstance() {
@@ -74,6 +75,9 @@ ClosureObj::ClosureObj(FunctionObj *functionObj):
 }
 
 void ClosureObj::mark() {
+#ifdef GC_DEBUG_PRINT
+    std::cout << "~ mark closure obj (with upvalue)" << std::endl;
+#endif
     Object::mark();
     functionObj->mark();
     for(const auto & upValueObj: upValues) {

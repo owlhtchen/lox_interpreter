@@ -11,4 +11,12 @@ extern std::vector<std::string> tokentype_to_string;
 // #define VECTOR
 #endif
 
+#ifndef GC_DEBUG_PRINT
+// #define GC_DEBUG_PRINT
+#endif
+
+#ifndef CAll_GC_EVERY
+// #define CAll_GC_EVERY
+#endif
+
 #endif //LOX_INTERPRETER_DEBUG_H

@@ -3,6 +3,7 @@
 #include <DerivedObject.h>
 #include <iostream>
 #include <VM.h>
+#include <debug.h>
 
 GarbageCollector &GarbageCollector::getInstance() {
     // the only instance
@@ -107,6 +108,9 @@ void GarbageCollector::markSweep() {
 }
 
 void GarbageCollector::markOpenUpValues() {
+#ifdef GC_DEBUG_PRINT
+    std::cout << "markOpenUpValues\n";
+#endif
     auto temp = allOpenUpValues;
     while (temp != nullptr) {
         temp->mark();

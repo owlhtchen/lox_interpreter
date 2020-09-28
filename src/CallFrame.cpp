@@ -184,8 +184,12 @@ void CallFrame::runFrame() {
             case OpCode::OP_CLOSURE: {
                 auto functionValue = readConstant();
                 auto newFunction = castToObj<FunctionObj>(&functionValue);
-                auto newClosure = GarbageCollector::getInstance().addObject(new ClosureObj(newFunction));
+//                auto newClosure = GarbageCollector::getInstance().addObject(new ClosureObj(newFunction));
+                // need to call addUpValuesToClosure before calling GarbageCollector::getInstance().addObject
+                // otherwise upValue can be deleted before being captured
+                auto newClosure = new ClosureObj(newFunction);
                 addUpValuesToClosure(newClosure);
+                newClosure = GarbageCollector::getInstance().addObject(newClosure);
                 pushStack(newClosure);
                 break;
             }
@@ -360,7 +364,9 @@ void CallFrame::runFrame() {
                 throw std::logic_error("unhandled Opcode in CallFrame: " + std::to_string(temp));
             }
         }
-        GarbageCollector::getInstance().markSweep();
+#ifdef CAll_GC_EVERY
+         GarbageCollector::getInstance().markSweep();
+#endif
     }
 }
 
